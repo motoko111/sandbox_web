@@ -1,0 +1,80 @@
+.keyboard{
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    touch-action: none;
+
+    background-color: #3b7e59;
+
+    width: 100%;
+}
+.keyboard-panel {
+    background-color: #455ff500;
+    pointer-events: none;
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+}
+.keyboard-item {
+    width: 50px;
+    height: 50px;
+    pointer-events: auto;
+    display: flex;
+    z-index: 90;
+    background-color:#888383;
+    border-radius:2px;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 50%);
+    justify-content: center;
+    align-items: center;
+    color:white;
+}
+.keyboard-item-center {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    z-index: 90;
+}
+.keyboard-item-up {
+    clip-path: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%);
+    background-color: #7e3b3b;
+    position: absolute;
+    top: 0px;
+    left: 50px;
+    z-index: 100;
+}
+.keyboard-item-down {
+    clip-path: polygon(50% 1%, 100% 38%, 100% 100%, 0 100%, 0% 38%);
+    background-color: #473b7e;
+    position: absolute;
+    bottom: 0px;
+    left: 50px;
+    z-index: 100;
+}
+.keyboard-item-left {
+    clip-path: polygon(0 0, 75% 0, 100% 50%, 75% 100%, 0 100%);
+    background-color: #3b7e59;
+    position: absolute;
+    top: 50px;
+    left: 0px;
+    z-index: 100;
+}
+.keyboard-item-right {
+    clip-path: polygon(25% 0, 100% 0, 100% 100%, 25% 100%, 0 50%);
+    background-color: #7e7d3b;
+    position: absolute;
+    top: 50px;
+    right: 0px;
+    z-index: 100;
+}
+.keyboard-item-select{
+    background-color:#353535;
+}
+.hidden {
+    visibility: collapse;
+}
