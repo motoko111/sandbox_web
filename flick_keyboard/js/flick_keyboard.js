@@ -33,7 +33,8 @@ class MultiKeyboard {
     constructor(rootId){
         this.root = document.getElementById(rootId);
         this.width = 5;
-        this.height = 5;
+        this.height = 4;
+        this.inputMap = {};
         this.create();
     }
     create(){
@@ -45,79 +46,90 @@ class MultiKeyboard {
         for(let i = 0; i < this.width * this.height; ++i) this.panels[i] = null;
         for(let y = 0; y < this.height; y++){
             for(let x = 0; x < this.width; x++){
+                this.inputMap[x + y * this.width] = ['あ','い','う','え','お'];
                 this.root.appendChild(this.createPanel(x,y));
             }
         }
     }
     updateSize(){
         let windowWidth = window.innerWidth;
-        this.cellSize = windowWidth/5;
+        this.cellSize = {x:0,y:0};
+        this.cellSize.x = windowWidth/5;
+        this.cellSize.y = this.cellSize.x * 0.7;
         this.cellPadding = 2;
-        this.offset = {x:-this.cellSize,y:-this.cellSize};
-        //let contentWidth = this.cellSize * (this.width + 1);
-        //this.root.style.bottom = (this.cellSize * (this.height + 1)) + "px";
-        //this.root.style.left = (windowWidth/2) - (contentWidth/2) + "px";
-        this.root.style.width = (this.cellSize + this.cellPadding) * (this.width ) + "px";
-        this.root.style.height = (this.cellSize + this.cellPadding) * (this.height ) + "px";
+        this.offset = {x:-this.cellSize.x,y:-this.cellSize.y};
+        this.child_offset = this.cellSize.x * 0.08;
+        this.root.style.width = (this.cellSize.x + this.cellPadding) * (this.width ) + "px";
+        this.root.style.height = (this.cellSize.y + this.cellPadding) * (this.height ) + "px";
     }
     createPanel(x,y){
         let root = document.createElement("div");
         root.classList.add("keyboard-panel");
-        root.style.width = this.cellSize * 3 + "px";
-        root.style.height = this.cellSize * 3 + "px";
-        root.style.top = y*(this.cellSize + this.cellPadding) + this.offset.y + "px";
-        root.style.left = x*(this.cellSize + this.cellPadding) + this.offset.x + "px";
+        root.style.width = this.cellSize.x * 3 + "px";
+        root.style.height = this.cellSize.y * 3 + "px";
+        root.style.top = y*(this.cellSize.y + this.cellPadding) + this.offset.y + "px";
+        root.style.left = x*(this.cellSize.x + this.cellPadding) + this.offset.x + "px";
         let panel = {};
         panel.x = x;
         panel.y = y;
         panel.element = root;
         panel.items = {};
-        root.appendChild(this.createItem(panel,panel.items,"center"));
-        root.appendChild(this.createItem(panel,panel.items,"up"));
-        root.appendChild(this.createItem(panel,panel.items,"down"));
-        root.appendChild(this.createItem(panel,panel.items,"left"));
-        root.appendChild(this.createItem(panel,panel.items,"right"));
+        let center = this.createItem(panel,panel.items,"center");
+        let up = this.createItem(panel,panel.items,"up");
+        let down = this.createItem(panel,panel.items,"down");
+        let left = this.createItem(panel,panel.items,"left");
+        let right = this.createItem(panel,panel.items,"right");
+        if(center) root.appendChild(center);
+        if(up) root.appendChild(up);
+        if(down) root.appendChild(down);
+        if(left) root.appendChild(left);
+        if(right) root.appendChild(right);
         this.panels[x + y*this.width] = panel;
         return root;
     }
     createItem(panel,items,type){
         let item = {};
+        let txt = this.getItemText(panel.x, panel.y, type);
+        if(txt == null) return null;
         let root = document.createElement("div");
-        root.textContent = "あ";
-        root.style.width = this.cellSize + "px";
-        root.style.height = this.cellSize + "px";
+        root.textContent = txt;
+        root.style.width = this.cellSize.x + "px";
+        root.style.height = this.cellSize.y + "px";
         root.classList.add("keyboard-item");
         root.classList.add("keyboard-item-" + type);
         item.parent = panel;
         item.element = root;
         item.type = type;
         items[type] = item;
+        let offsetY = 0;
         if(type == "center"){
             this.addEvent(item);
         }
         else{
             root.classList.add("hidden");
+            root.style.height = this.cellSize.x + "px";
+            offsetY = -(this.cellSize.x - this.cellSize.y)/2;
         }
         switch(type){
             case "center":{
-                item.element.style.top = this.cellSize + "px";
-                item.element.style.left = this.cellSize + "px";
+                item.element.style.top = this.cellSize.y + "px";
+                item.element.style.left = this.cellSize.x + "px";
             }break;
             case "up":{
-                item.element.style.top = 0 + "px";
-                item.element.style.left = this.cellSize + "px";
+                item.element.style.top = this.child_offset + offsetY + "px";
+                item.element.style.left = this.cellSize.x + "px";
             }break;
             case "down":{
-                item.element.style.bottom = 0 + "px";
-                item.element.style.left = this.cellSize + "px";
+                item.element.style.bottom = this.child_offset + offsetY + "px";
+                item.element.style.left = this.cellSize.x + "px";
             }break;
             case "left":{
-                item.element.style.top = this.cellSize + "px";
-                item.element.style.left = 0 + "px";
+                item.element.style.top = this.cellSize.y + offsetY + "px";
+                item.element.style.left = this.child_offset + "px";
             }break;
             case "right":{
-                item.element.style.top = this.cellSize + "px";
-                item.element.style.right = 0 + "px";
+                item.element.style.top = this.cellSize.y + offsetY + "px";
+                item.element.style.right = this.child_offset + "px";
             }break;
         }
         return root;
@@ -224,11 +236,7 @@ class MultiKeyboard {
     }
     updatePanel(panel,x,y,isCtrl){
         
-        panel.items.center.element.classList.remove("hidden");
-        panel.items.up.element.classList.add("hidden");
-        panel.items.down.element.classList.add("hidden");
-        panel.items.right.element.classList.add("hidden");
-        panel.items.left.element.classList.add("hidden");
+        this.allItemHidden(panel);
 
         if(isCtrl){
             let rate = this.getInsideRate(panel.element, x,y);
@@ -256,9 +264,33 @@ class MultiKeyboard {
                     way = "right";
                 }
             }
-            panel.items[way].element.classList.remove("hidden");
+            if(panel.items[way]) panel.items[way].element.classList.remove("hidden");
         }
         
+    }
+    allItemHidden(panel){
+        if(panel.items.center) panel.items.center.element.classList.remove("hidden");
+        if(panel.items.up) panel.items.up.element.classList.add("hidden");
+        if(panel.items.down) panel.items.down.element.classList.add("hidden");
+        if(panel.items.right) panel.items.right.element.classList.add("hidden");
+        if(panel.items.left) panel.items.left.element.classList.add("hidden");
+    }
+    getItemText(x,y,type){
+        let arr = this.inputMap[x + y];
+        if(!arr) return null;
+        let index = this.typeToIndex(type);
+        if(arr.length <= index) return null;
+        return arr[index];
+    }
+    typeToIndex(type){
+        switch(type){
+            case "center":return 0;
+            case "up":return 1;
+            case "left":return 2;
+            case "down":return 3;
+            case "right":return 4;
+        }
+        return 0;
     }
 }
 

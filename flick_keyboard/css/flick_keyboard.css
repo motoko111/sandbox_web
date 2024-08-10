@@ -6,7 +6,7 @@
     background-color: #333;
     display: flex;
     flex-direction: column;
-    justify-content: end; /*中央寄せ*/
+    justify-content: end; /*下寄せ*/
     align-items: center; /*各アイテムを中央寄せ*/
 }
 
@@ -18,7 +18,7 @@
     -khtml-user-select: none;
     touch-action: none;
 
-    background-color: #3b7e59;
+    background-color: #303030b7;
     width: 250px;
     height: 250px;
     font-size: 3rem;
@@ -41,7 +41,7 @@
     pointer-events: auto;
     display: flex;
     z-index: 90;
-    background-color:#888383;
+    background-color:#888383a1;
     border-radius:0.5rem;
     box-shadow: 0 0.5rem 0.5rem 0 rgb(0 0 0 / 50%);
     justify-content: center;
@@ -56,7 +56,7 @@
 }
 .keyboard-item-up {
     clip-path: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%);
-    background-color: #7e3b3b;
+    background-color:#4b4b4b;
     position: absolute;
     top: 0px;
     left: 50px;
@@ -64,7 +64,7 @@
 }
 .keyboard-item-down {
     clip-path: polygon(50% 1%, 100% 38%, 100% 100%, 0 100%, 0% 38%);
-    background-color: #473b7e;
+    background-color:#4b4b4b;
     position: absolute;
     bottom: 0px;
     left: 50px;
@@ -72,7 +72,7 @@
 }
 .keyboard-item-left {
     clip-path: polygon(0 0, 75% 0, 100% 50%, 75% 100%, 0 100%);
-    background-color: #3b7e59;
+    background-color:#4b4b4b;
     position: absolute;
     top: 50px;
     left: 0px;
@@ -80,7 +80,7 @@
 }
 .keyboard-item-right {
     clip-path: polygon(25% 0, 100% 0, 100% 100%, 25% 100%, 0 50%);
-    background-color: #7e7d3b;
+    background-color:#4b4b4b;
     position: absolute;
     top: 50px;
     right: 0px;
