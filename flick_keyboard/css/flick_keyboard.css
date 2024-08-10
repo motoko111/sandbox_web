@@ -26,6 +26,7 @@
     font-size: 3rem;
     position: absolute;
     backdrop-filter: blur(20px); /* 背景にブラーを適用 */
+    -webkit-backdrop-filter: blur(20px); /* 背景にブラーを適用 safari */
 }
 .keyboard-panel {
     background-color: #455ff500;
