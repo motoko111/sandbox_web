@@ -1,6 +1,7 @@
 {
     "width":5,
     "height":4,
+    "defaultTriggerType":"down",
     "params":[
         ["oct+"],
         ["c","c-",null,"c+"],

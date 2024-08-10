@@ -15,9 +15,15 @@
     .dropdown select{
       font-size: 1em;
     }
+    textarea {
+      width: 100%;
+    }
+    body {
+        overflow: hidden;
+    }
   </style>
 </head>
-<body background="assets/test.jpg" style="background-size: cover; background-repeat: no-repeat;">
+<body background="assets/test2.jpg" style="background-size: cover; background-repeat: no-repeat;">
   <div class="dropdown">
     <label for="dropdown">キーボード切替:</label>
     <select id="dropdown" name="options">
@@ -26,7 +32,22 @@
     </select>
   </div>
 
+  
+  <div>
+    <textarea id="keyboard_log" rows="10"></textarea>
+    <button id="keyboard_log_clear" style="font-size: 2em;">clear</button>
+  </div>
+  <div class="footer">
+    <div id="keyboard" class="keyboard">
+    </div>
+  </div>
+
   <script>
+    let keyboard_log = document.getElementById("keyboard_log");
+    document.getElementById("keyboard_log_clear").addEventListener("click",function(){
+      keyboard_log.value = "";
+    });
+
     let keyboard = null;
     let loadJsonAsync = async (path) => {
         const response = await fetch(path);
@@ -37,6 +58,9 @@
     window.onload = (ev) => {
         keyboard = new MultiKeyboard("keyboard");
         loadJsonAsync("./assets/flick_keyboard.json");
+        keyboard.defaultKeyEvent = (val) => {
+          keyboard_log.value = keyboard_log.value + val;
+        };
     }
 
     // JavaScriptでドロップダウンメニューの処理を行う
@@ -46,10 +70,5 @@
         loadJsonAsync("assets/" + selectedValue);
     });
   </script>
-
-  <div class="footer blurBg">
-    <div id="keyboard" class="keyboard">
-    </div>
-  </div>
 </body>
 </html>

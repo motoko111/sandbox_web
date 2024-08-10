@@ -38,12 +38,18 @@ class MultiKeyboard {
         this.inputMap = {};
         let _this = this;
         window.addEventListener("resize", () => _this.onResize);
+        this.keyEvents = {};
+        this.defaultTriggerType = "up";
+        this.defaultKeyEvent = (txt) => {
+            console.log(txt);
+        };
         this.create();
     }
     loadJson(json){
         let obj = JSON.parse(json);
         this.width = obj.width;
         this.height = obj.height;
+        this.defaultTriggerType = obj.defaultTriggerType ? obj.defaultTriggerType : "up";
         this.params = obj.params;
         this.create();
     }
@@ -122,6 +128,7 @@ class MultiKeyboard {
         root.classList.add("keyboard-item");
         root.classList.add("keyboard-item-" + type);
         if(param.class) root.classList.add(param.class);
+        item.param = param;
         item.parent = panel;
         item.element = root;
         item.type = type;
@@ -161,26 +168,23 @@ class MultiKeyboard {
     }
     addEvent(item){
         let _this = this;
-        item.element.addEventListener("mousedown", (e) => {
+        item.element.addEventListener("pointerdown", (e) => {
             e.preventDefault();
             _this.onMouseDown(item,e.pageX,e.pageY);
         });
-        item.element.addEventListener("mouseup", (e) => {
+        item.element.addEventListener("pointerup", (e) => {
             e.preventDefault();
             _this.onMouseUp(item,e.pageX,e.pageY);
         });
-        item.element.addEventListener("mousemove", (e) => {
+        item.element.addEventListener("pointermove", (e) => {
             e.preventDefault();
             _this.onMouseMove(item,e.pageX,e.pageY);
         });
-        item.element.addEventListener("dragend", (e) => {
+        item.element.addEventListener("pointercancel", (e) => {
             e.preventDefault();
             _this.onMouseUp(item,e.pageX,e.pageY);
         });
-        item.element.addEventListener("dragleave", (e) => {
-            e.preventDefault();
-            _this.onMouseUp(item,e.pageX,e.pageY);
-        });
+        /*
         item.element.ontouchstart = (e) => {
             e.preventDefault();
             _this.onMouseDown(item,e.changedTouches[0].pageX,e.changedTouches[0].pageY);
@@ -197,6 +201,7 @@ class MultiKeyboard {
             e.preventDefault();
             _this.onMouseUp(item,e.changedTouches[0].pageX,e.changedTouches[0].pageY);
         };
+        */
     }
     onResize(){
         this.ctrlItem = null;
@@ -211,12 +216,18 @@ class MultiKeyboard {
             this.ctrlItem.element.classList.remove("keyboard-item-select");
             this.ctrlItem.element.classList.add("keyboard-item-select");
             this.updatePanel(this.ctrlItem.parent,x,y,true);
+            if(item.param.triggerType == "down"|| (!item.param.triggerType && this.defaultTriggerType == "down")){
+                this.onKeyEvent(item.param.value);
+            }
             //console.log(`onMouseDown: ${item.type} ${x},${y}`);
         }
     }
     onMouseUp(item,x,y){
         if(this.ctrlItem)
         {
+            if(this.ctrlWayItem && (this.ctrlWayItem.param.triggerType == "up" || (!this.ctrlWayItem.param.triggerType && this.defaultTriggerType == "up"))){
+                this.onKeyEvent(this.ctrlWayItem.param.value);
+            }
             this.ctrlItem.element.classList.remove("keyboard-item-select");
             this.updatePanel(this.ctrlItem.parent,x,y,false);
             this.endPos = {x:x,y:y};
@@ -232,6 +243,10 @@ class MultiKeyboard {
             this.currentPos = {x:x,y:y};
             //console.log(`onMouseMove: ${item.type} ${x},${y}`);
         }
+    }
+    onKeyEvent(value){
+        if(this.keyEvents[value]) this.keyEvents[value]();
+        if(this.defaultKeyEvent) this.defaultKeyEvent(value);
     }
     isInside(element, x, y) {
         // 要素の領域を取得
@@ -289,7 +304,11 @@ class MultiKeyboard {
                     way = "right";
                 }
             }
-            if(panel.items[way]) panel.items[way].element.classList.remove("hidden");
+            this.ctrlWayItem = null;
+            if(panel.items[way]) {
+                panel.items[way].element.classList.remove("hidden");
+                this.ctrlWayItem = panel.items[way];
+            }
         }
         
     }
@@ -306,7 +325,10 @@ class MultiKeyboard {
         let index = this.typeToIndex(type);
         if(arr.length <= index) return null;
         let param = arr[index];
-        if(typeof param == "string") return {text:param};
+        if(param == null || param == undefined) return param;
+        if(typeof param == "string") param = {text:param};
+        if(!param.value) param.value = param.text;
+        if(!param.triggerType) param.triggerType = this.defaultTriggerType;
         return param;
     }
     typeToIndex(type){

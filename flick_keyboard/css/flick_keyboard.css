@@ -24,6 +24,7 @@
     width: 250px;
     height: 250px;
     font-size: 3rem;
+    font-family: sans-serif ;
     position: absolute;
     backdrop-filter: blur(20px); /* 背景にブラーを適用 */
     -webkit-backdrop-filter: blur(20px); /* 背景にブラーを適用 safari */
@@ -59,7 +60,7 @@
     z-index: 90;
 }
 .keyboard-item-up {
-    clip-path: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%);
+    clip-path: polygon(0 0%, 100% 0%, 100% 82%, 50% 90%, 0 82%);
     background-color:#4b4b4b;
     position: absolute;
     top: 0px;
@@ -67,7 +68,7 @@
     z-index: 100;
 }
 .keyboard-item-down {
-    clip-path: polygon(50% 1%, 100% 38%, 100% 100%, 0 100%, 0% 38%);
+    clip-path: polygon(50% 10%, 100% 18%, 100% 100%, 0 100%, 0% 18%);
     background-color:#4b4b4b;
     position: absolute;
     bottom: 0px;
@@ -75,7 +76,7 @@
     z-index: 100;
 }
 .keyboard-item-left {
-    clip-path: polygon(0 0, 75% 0, 100% 50%, 75% 100%, 0 100%);
+    clip-path: polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%);
     background-color:#4b4b4b;
     position: absolute;
     top: 50px;
@@ -83,7 +84,7 @@
     z-index: 100;
 }
 .keyboard-item-right {
-    clip-path: polygon(25% 0, 100% 0, 100% 100%, 25% 100%, 0 50%);
+    clip-path: polygon(18% 0, 100% 0, 100% 100%, 18% 100%, 0 50%);
     background-color:#4b4b4b;
     position: absolute;
     top: 50px;
