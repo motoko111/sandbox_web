@@ -36,6 +36,7 @@ class MultiKeyboard {
         this.height = 4;
         this.params = [["あ","い","う","え","お"]];
         this.inputMap = {};
+        this.ctrlKeyInfos = {};
         let _this = this;
         window.addEventListener("resize", () => _this.onResize);
         this.keyEvents = {};
@@ -186,65 +187,77 @@ class MultiKeyboard {
         });
         item.element.ontouchstart = (e) => {
             e.preventDefault();
-            _this.onMouseDown(item,e.changedTouches[0].pageX,e.changedTouches[0].pageY);
+            for(let i = 0; i < e.changedTouches.length; ++i) _this.onMouseDown(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
         };
         item.element.ontouchend = (e) => {
             e.preventDefault();
-            _this.onMouseUp(item,e.changedTouches[0].pageX,e.changedTouches[0].pageY);
+            for(let i = 0; i < e.changedTouches.length; ++i) _this.onMouseUp(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
         };
         item.element.ontouchmove = (e) => {
             e.preventDefault();
-            _this.onMouseMove(item,e.changedTouches[0].pageX,e.changedTouches[0].pageY);
+            for(let i = 0; i < e.changedTouches.length; ++i) _this.onMouseMove(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
         };
         item.element.ontouchcancel = (e) => {
             e.preventDefault();
-            _this.onMouseUp(item,e.changedTouches[0].pageX,e.changedTouches[0].pageY);
+            for(let i = 0; i < e.changedTouches.length; ++i) _this.onMouseUp(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
         };
     }
     onResize(){
-        this.ctrlItem = null;
+        this.ctrlKeyInfos = {};
         this.create();
     }
     onMouseDown(item,x,y){
-        if(this.ctrlItem == null)
-        {
-            this.ctrlItem = item;
+        let ctrlInfo = this.ctrlKeyInfos[item];
+        if(!ctrlInfo){
+            this.ctrlKeyInfos[item] = {};
+            ctrlInfo = this.ctrlKeyInfos[item];
+            ctrlInfo.item = item;
+            let ctrlItem = ctrlInfo.item;
             this.startPos = {x:x,y:y};
             this.currentPos = {x:x,y:y};
-            this.ctrlItem.element.classList.remove("keyboard-item-select");
-            this.ctrlItem.element.classList.add("keyboard-item-select");
-            this.updatePanel(this.ctrlItem.parent,x,y,true);
+            ctrlItem.element.classList.remove("keyboard-item-select");
+            ctrlItem.element.classList.add("keyboard-item-select");
+            this.updatePanel(ctrlItem.parent,x,y,true);
             if(item.param.triggerType == "down" || item.param.triggerType == "multi"){
-                this.onKeyEvent(item.param.value);
+                this.onKeyEvent(item.param.value, "down");
             }
-            //console.log(`onMouseDown: ${item.type} ${x},${y}`);
         }
     }
     onMouseUp(item,x,y){
-        if(this.ctrlItem)
-        {
-            if(this.ctrlWayItem && (this.ctrlWayItem.param.triggerType == "up" || this.ctrlWayItem.param.triggerType == "multi")){
-                this.onKeyEvent(this.ctrlWayItem.param.value);
+        let ctrlInfo = this.ctrlKeyInfos[item];
+        if(ctrlInfo){
+            let ctrlItem = ctrlInfo.item;
+            if(ctrlItem)
+            {
+                let ctrlWayItem = ctrlInfo.wayItem;
+                if(ctrlWayItem && (ctrlWayItem.param.triggerType == "up" || ctrlWayItem.param.triggerType == "multi")){
+                    this.onKeyEvent(ctrlWayItem.param.value, "up");
+                }
+                ctrlItem.element.classList.remove("keyboard-item-select");
+                this.updatePanel(ctrlItem.parent,x,y,false);
+                this.endPos = {x:x,y:y};
+                this.currentPos = {x:x,y:y};
+                //console.log(`onMouseUp: ${item.type} ${x},${y}`);
+                ctrlItem = null;
+                this.ctrlKeyInfos[item] = null;
             }
-            this.ctrlItem.element.classList.remove("keyboard-item-select");
-            this.updatePanel(this.ctrlItem.parent,x,y,false);
-            this.endPos = {x:x,y:y};
-            this.currentPos = {x:x,y:y};
-            //console.log(`onMouseUp: ${item.type} ${x},${y}`);
-            this.ctrlItem = null;
         }
     }
     onMouseMove(item,x,y){
-        if(this.ctrlItem)
-        {
-            this.updatePanel(this.ctrlItem.parent,x,y,true);
-            this.currentPos = {x:x,y:y};
-            //console.log(`onMouseMove: ${item.type} ${x},${y}`);
+        let ctrlInfo = this.ctrlKeyInfos[item];
+        if(ctrlInfo){
+            let ctrlItem = ctrlInfo.item;
+            if(ctrlItem)
+            {
+                this.updatePanel(ctrlItem.parent,x,y,true);
+                this.currentPos = {x:x,y:y};
+                //console.log(`onMouseMove: ${item.type} ${x},${y}`);
+            }
         }
     }
-    onKeyEvent(value){
-        if(this.keyEvents[value]) this.keyEvents[value]();
-        if(this.defaultKeyEvent) this.defaultKeyEvent(value);
+    onKeyEvent(value, type){
+        if(this.keyEvents[value]) this.keyEvents[value](type);
+        if(this.defaultKeyEvent) this.defaultKeyEvent(value, type);
     }
     isInside(element, x, y) {
         // 要素の領域を取得
@@ -302,10 +315,10 @@ class MultiKeyboard {
                     way = "right";
                 }
             }
-            this.ctrlWayItem = null;
+            this.ctrlKeyInfos[panel.items["center"]].wayItem = null;
             if(panel.items[way]) {
                 panel.items[way].element.classList.remove("hidden");
-                this.ctrlWayItem = panel.items[way];
+                this.ctrlKeyInfos[panel.items["center"]].wayItem = panel.items[way];
             }
         }
         

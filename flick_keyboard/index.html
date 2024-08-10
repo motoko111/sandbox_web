@@ -60,11 +60,16 @@
     window.onload = (ev) => {
         keyboard = new MultiKeyboard("keyboard");
         loadJsonAsync("./assets/flick_keyboard.json");
-        keyboard.defaultKeyEvent = (val) => {
+        keyboard.defaultKeyEvent = (val,type) => {
           if(val === "del"){
             if(keyboard_log.value && keyboard_log.value.length > 0) keyboard_log.value = keyboard_log.value.slice(0, keyboard_log.value.length - 1);
           }
           else{
+            if(type == "up"){
+            }
+            else{
+
+            }
             keyboard_log.value = keyboard_log.value + val;
           }
         };
