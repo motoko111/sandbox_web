@@ -17,6 +17,7 @@
     }
     textarea {
       width: 100%;
+      font-size: 2em;
     }
     body {
         overflow: hidden;
@@ -29,6 +30,8 @@
     <select id="dropdown" name="options">
       <option value="flick_keyboard.json">flick_keyboard.json</option>
       <option value="flick_keyboard_mml.json">flick_keyboard_mml.json</option>
+      <option value="flick_keyboard_kyoiku.json">flick_keyboard_kyoiku.json</option>
+      <option value="flick_keyboard_calc.json">flick_keyboard_calc.json</option>
     </select>
   </div>
 
@@ -59,7 +62,12 @@
         keyboard = new MultiKeyboard("keyboard");
         loadJsonAsync("./assets/flick_keyboard.json");
         keyboard.defaultKeyEvent = (val) => {
-          keyboard_log.value = keyboard_log.value + val;
+          if(val === "del"){
+            if(keyboard_log.value && keyboard_log.value.length > 0) keyboard_log.value = keyboard_log.value.slice(0, keyboard_log.value.length - 1);
+          }
+          else{
+            keyboard_log.value = keyboard_log.value + val;
+          }
         };
     }
 

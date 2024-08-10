@@ -184,7 +184,6 @@ class MultiKeyboard {
             e.preventDefault();
             _this.onMouseUp(item,e.pageX,e.pageY);
         });
-        /*
         item.element.ontouchstart = (e) => {
             e.preventDefault();
             _this.onMouseDown(item,e.changedTouches[0].pageX,e.changedTouches[0].pageY);
@@ -201,7 +200,6 @@ class MultiKeyboard {
             e.preventDefault();
             _this.onMouseUp(item,e.changedTouches[0].pageX,e.changedTouches[0].pageY);
         };
-        */
     }
     onResize(){
         this.ctrlItem = null;
@@ -216,7 +214,7 @@ class MultiKeyboard {
             this.ctrlItem.element.classList.remove("keyboard-item-select");
             this.ctrlItem.element.classList.add("keyboard-item-select");
             this.updatePanel(this.ctrlItem.parent,x,y,true);
-            if(item.param.triggerType == "down"|| (!item.param.triggerType && this.defaultTriggerType == "down")){
+            if(item.param.triggerType == "down" || item.param.triggerType == "multi"){
                 this.onKeyEvent(item.param.value);
             }
             //console.log(`onMouseDown: ${item.type} ${x},${y}`);
@@ -225,7 +223,7 @@ class MultiKeyboard {
     onMouseUp(item,x,y){
         if(this.ctrlItem)
         {
-            if(this.ctrlWayItem && (this.ctrlWayItem.param.triggerType == "up" || (!this.ctrlWayItem.param.triggerType && this.defaultTriggerType == "up"))){
+            if(this.ctrlWayItem && (this.ctrlWayItem.param.triggerType == "up" || this.ctrlWayItem.param.triggerType == "multi")){
                 this.onKeyEvent(this.ctrlWayItem.param.value);
             }
             this.ctrlItem.element.classList.remove("keyboard-item-select");
@@ -327,7 +325,7 @@ class MultiKeyboard {
         let param = arr[index];
         if(param == null || param == undefined) return param;
         if(typeof param == "string") param = {text:param};
-        if(!param.value) param.value = param.text;
+        if(param.value == undefined) param.value = param.text;
         if(!param.triggerType) param.triggerType = this.defaultTriggerType;
         return param;
     }

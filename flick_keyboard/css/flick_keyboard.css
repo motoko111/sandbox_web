@@ -20,7 +20,7 @@
     -khtml-user-select: none;
     touch-action: none;
 
-    background-color: #000000d2;
+    background-color: #000000b4;
     width: 250px;
     height: 250px;
     font-size: 3rem;
@@ -46,7 +46,7 @@
     pointer-events: auto;
     display: flex;
     z-index: 90;
-    background-color:#88838393;
+    background-color:#9c959593;
     border-radius:0.5rem;
     box-shadow: 0 0.2rem 0.2rem 0 rgb(0 0 0 / 50%);
     justify-content: center;
