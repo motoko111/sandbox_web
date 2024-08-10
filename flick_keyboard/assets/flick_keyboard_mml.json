@@ -1,0 +1,26 @@
+{
+    "width":5,
+    "height":4,
+    "params":[
+        ["o+"],
+        ["c","c-",null,"c+"],
+        ["d","d-",null,"d+"],
+        ["e","e-",null,"e+"],
+        ["×"],
+        ["o-"],
+        ["f","f-",null,"f+"],
+        ["g","g-",null,"g+"],
+        ["a","a-",null,"a+"],
+        ["r"],
+        ["key+"],
+        ["b","b-",null,"b+"],
+        ["↑"],
+        ["c","c-",null,"c+"],
+        [{"text":"決定", "height":2, "class":"keyboard-item-blue"}],
+        ["key-"],
+        ["←"],
+        ["↓"],
+        ["→"],
+        []
+    ]
+}

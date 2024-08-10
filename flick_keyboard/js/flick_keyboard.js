@@ -34,7 +34,15 @@ class MultiKeyboard {
         this.root = document.getElementById(rootId);
         this.width = 5;
         this.height = 4;
+        this.params = [["あ","い","う","え","お"]];
         this.inputMap = {};
+        this.create();
+    }
+    loadJson(json){
+        let obj = JSON.parse(json);
+        this.width = obj.width;
+        this.height = obj.height;
+        this.params = obj.params;
         this.create();
     }
     create(){
@@ -46,7 +54,14 @@ class MultiKeyboard {
         for(let i = 0; i < this.width * this.height; ++i) this.panels[i] = null;
         for(let y = 0; y < this.height; y++){
             for(let x = 0; x < this.width; x++){
-                this.inputMap[x + y * this.width] = ['あ','い','う','え','お'];
+                let index = x + y * this.width;
+                if(index < this.params.length){
+                    this.inputMap[index] = this.params[index];
+                    console.log(this.inputMap[index] + " :" + index)
+                }
+                else{
+                    this.inputMap[index] = null;
+                }
                 this.root.appendChild(this.createPanel(x,y));
             }
         }
@@ -89,14 +104,18 @@ class MultiKeyboard {
     }
     createItem(panel,items,type){
         let item = {};
-        let txt = this.getItemText(panel.x, panel.y, type);
-        if(txt == null) return null;
+        let param = this.getItemParam(panel.x, panel.y, type);
+        if(param == null) return null;
+        let txt = param.text;
+        let widthRate = param.width ? param.width : 1;
+        let heightRate = param.height ? param.height : 1;
         let root = document.createElement("div");
         root.textContent = txt;
-        root.style.width = this.cellSize.x + "px";
-        root.style.height = this.cellSize.y + "px";
+        root.style.width = this.cellSize.x * widthRate + (this.cellPadding * (widthRate - 1))+ "px";
+        root.style.height = this.cellSize.y * heightRate + (this.cellPadding * (heightRate - 1))+ "px";
         root.classList.add("keyboard-item");
         root.classList.add("keyboard-item-" + type);
+        if(param.class) root.classList.add(param.class);
         item.parent = panel;
         item.element = root;
         item.type = type;
@@ -275,29 +294,37 @@ class MultiKeyboard {
         if(panel.items.right) panel.items.right.element.classList.add("hidden");
         if(panel.items.left) panel.items.left.element.classList.add("hidden");
     }
-    getItemText(x,y,type){
-        let arr = this.inputMap[x + y];
+    getItemParam(x,y,type){
+        let arr = this.inputMap[x + y * this.width];
         if(!arr) return null;
         let index = this.typeToIndex(type);
         if(arr.length <= index) return null;
-        return arr[index];
+        let param = arr[index];
+        if(typeof param == "string") return {text:param};
+        return param;
     }
     typeToIndex(type){
         switch(type){
             case "center":return 0;
-            case "up":return 1;
-            case "left":return 2;
-            case "down":return 3;
-            case "right":return 4;
+            case "left":return 1;
+            case "up":return 2;
+            case "right":return 3;
+            case "down":return 4;
         }
         return 0;
     }
 }
 
 let keyboard = null;
+let onloadAsync = async () => {
+    const response = await fetch("./assets/flick_keyboard_mml.json");
+    let txt = await response.text();
+    keyboard.loadJson(txt);
+};
 
 window.onload = (ev) => {
     keyboard = new MultiKeyboard("keyboard");
+    onloadAsync();
 }
 window.onresize = () => {
     keyboard.onResize();
