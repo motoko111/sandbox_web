@@ -37,6 +37,7 @@ class MultiKeyboard {
         this.create();
     }
     create(){
+        this.updateSize();
         while( this.root.firstChild ){
             this.root.removeChild( this.root.firstChild );
         }
@@ -48,11 +49,24 @@ class MultiKeyboard {
             }
         }
     }
+    updateSize(){
+        let windowWidth = window.innerWidth;
+        this.cellSize = windowWidth/5;
+        this.cellPadding = 2;
+        this.offset = {x:-this.cellSize,y:-this.cellSize};
+        //let contentWidth = this.cellSize * (this.width + 1);
+        //this.root.style.bottom = (this.cellSize * (this.height + 1)) + "px";
+        //this.root.style.left = (windowWidth/2) - (contentWidth/2) + "px";
+        this.root.style.width = (this.cellSize + this.cellPadding) * (this.width ) + "px";
+        this.root.style.height = (this.cellSize + this.cellPadding) * (this.height ) + "px";
+    }
     createPanel(x,y){
         let root = document.createElement("div");
         root.classList.add("keyboard-panel");
-        root.style.top = y*52 + "px";
-        root.style.left = x*52 + "px";
+        root.style.width = this.cellSize * 3 + "px";
+        root.style.height = this.cellSize * 3 + "px";
+        root.style.top = y*(this.cellSize + this.cellPadding) + this.offset.y + "px";
+        root.style.left = x*(this.cellSize + this.cellPadding) + this.offset.x + "px";
         let panel = {};
         panel.x = x;
         panel.y = y;
@@ -70,6 +84,8 @@ class MultiKeyboard {
         let item = {};
         let root = document.createElement("div");
         root.textContent = "あ";
+        root.style.width = this.cellSize + "px";
+        root.style.height = this.cellSize + "px";
         root.classList.add("keyboard-item");
         root.classList.add("keyboard-item-" + type);
         item.parent = panel;
@@ -81,6 +97,28 @@ class MultiKeyboard {
         }
         else{
             root.classList.add("hidden");
+        }
+        switch(type){
+            case "center":{
+                item.element.style.top = this.cellSize + "px";
+                item.element.style.left = this.cellSize + "px";
+            }break;
+            case "up":{
+                item.element.style.top = 0 + "px";
+                item.element.style.left = this.cellSize + "px";
+            }break;
+            case "down":{
+                item.element.style.bottom = 0 + "px";
+                item.element.style.left = this.cellSize + "px";
+            }break;
+            case "left":{
+                item.element.style.top = this.cellSize + "px";
+                item.element.style.left = 0 + "px";
+            }break;
+            case "right":{
+                item.element.style.top = this.cellSize + "px";
+                item.element.style.right = 0 + "px";
+            }break;
         }
         return root;
     }
@@ -97,6 +135,14 @@ class MultiKeyboard {
         item.element.addEventListener("mousemove", (e) => {
             e.preventDefault();
             _this.onMouseMove(item,e.pageX,e.pageY);
+        });
+        item.element.addEventListener("dragend", (e) => {
+            e.preventDefault();
+            _this.onMouseUp(item,e.pageX,e.pageY);
+        });
+        item.element.addEventListener("dragleave", (e) => {
+            e.preventDefault();
+            _this.onMouseUp(item,e.pageX,e.pageY);
         });
         item.element.ontouchstart = (e) => {
             e.preventDefault();
@@ -115,14 +161,18 @@ class MultiKeyboard {
             _this.onMouseUp(item,e.changedTouches[0].pageX,e.changedTouches[0].pageY);
         };
     }
+    onResize(){
+        this.ctrlItem = null;
+        this.create();
+    }
     onMouseDown(item,x,y){
         if(this.ctrlItem == null)
         {
             this.ctrlItem = item;
             this.startPos = {x:x,y:y};
             this.currentPos = {x:x,y:y};
-            this.ctrlItem.element.classList.remove(".keyboard-item-select");
-            this.ctrlItem.element.classList.add(".keyboard-item-select");
+            this.ctrlItem.element.classList.remove("keyboard-item-select");
+            this.ctrlItem.element.classList.add("keyboard-item-select");
             this.updatePanel(this.ctrlItem.parent,x,y,true);
             console.log(`onMouseDown: ${item.type} ${x},${y}`);
         }
@@ -130,7 +180,7 @@ class MultiKeyboard {
     onMouseUp(item,x,y){
         if(this.ctrlItem)
         {
-            this.ctrlItem.element.classList.remove(".keyboard-item-select");
+            this.ctrlItem.element.classList.remove("keyboard-item-select");
             this.updatePanel(this.ctrlItem.parent,x,y,false);
             this.endPos = {x:x,y:y};
             this.currentPos = {x:x,y:y};
@@ -211,3 +261,12 @@ class MultiKeyboard {
         
     }
 }
+
+let keyboard = null;
+
+window.onload = (ev) => {
+    keyboard = new MultiKeyboard("keyboard");
+}
+window.onresize = () => {
+    keyboard.onResize();
+};
