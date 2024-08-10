@@ -1,6 +1,9 @@
 .mobile-footer-menu-buttons{
     display: none;
 }
+html {
+    touch-action: manipulation;
+  }
 .footer{
     position: fixed;
     bottom: 0;
