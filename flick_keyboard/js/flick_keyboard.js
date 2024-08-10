@@ -169,6 +169,7 @@ class MultiKeyboard {
     }
     addEvent(item){
         let _this = this;
+        /*
         item.element.addEventListener("pointerdown", (e) => {
             e.preventDefault();
             _this.onMouseDown(item,e.pageX,e.pageY);
@@ -185,6 +186,7 @@ class MultiKeyboard {
             e.preventDefault();
             _this.onMouseUp(item,e.pageX,e.pageY);
         });
+        */
         item.element.ontouchstart = (e) => {
             e.preventDefault();
             for(let i = 0; i < e.changedTouches.length; ++i) _this.onMouseDown(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
