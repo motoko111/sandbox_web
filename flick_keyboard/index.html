@@ -6,10 +6,49 @@
   <link rel="stylesheet" href="css/flick_keyboard.css">
   <script src="js/flick_keyboard.js"></script>
   <script src="js/main.js"></script>
+
+  <style>
+    .dropdown {
+      font-size: 2em;
+      height: 100px;
+    }
+    .dropdown select{
+      font-size: 1em;
+    }
+  </style>
 </head>
-<body>
-  <div class="footer">
-    <div id="keyboard" class="keyboard blurBg">
+<body background="assets/test.jpg">
+  <div class="dropdown">
+    <label for="dropdown">キーボード切替:</label>
+    <select id="dropdown" name="options">
+      <option value="flick_keyboard.json">flick_keyboard.json</option>
+      <option value="flick_keyboard_mml.json">flick_keyboard_mml.json</option>
+    </select>
+  </div>
+
+  <script>
+    let keyboard = null;
+    let loadJsonAsync = async (path) => {
+        const response = await fetch(path);
+        let txt = await response.text();
+        keyboard.loadJson(txt);
+    };
+
+    window.onload = (ev) => {
+        keyboard = new MultiKeyboard("keyboard");
+        loadJsonAsync("./assets/flick_keyboard.json");
+    }
+
+    // JavaScriptでドロップダウンメニューの処理を行う
+    document.getElementById('dropdown').addEventListener('change', function() {
+        var selectedValue = this.value;
+        console.log(selectedValue)
+        loadJsonAsync("assets/" + selectedValue);
+    });
+  </script>
+
+  <div class="footer blurBg">
+    <div id="keyboard" class="keyboard">
     </div>
   </div>
 </body>

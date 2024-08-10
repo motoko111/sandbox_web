@@ -36,6 +36,8 @@ class MultiKeyboard {
         this.height = 4;
         this.params = [["あ","い","う","え","お"]];
         this.inputMap = {};
+        let _this = this;
+        window.addEventListener("resize", () => _this.onResize);
         this.create();
     }
     loadJson(json){
@@ -57,7 +59,7 @@ class MultiKeyboard {
                 let index = x + y * this.width;
                 if(index < this.params.length){
                     this.inputMap[index] = this.params[index];
-                    console.log(this.inputMap[index] + " :" + index)
+                    //console.log(this.inputMap[index] + " :" + index)
                 }
                 else{
                     this.inputMap[index] = null;
@@ -68,10 +70,14 @@ class MultiKeyboard {
     }
     updateSize(){
         let windowWidth = window.innerWidth;
+        let windowHeight = window.innerHeight;
+        if(windowHeight < windowWidth){
+            windowWidth = windowHeight;
+        }
         this.cellSize = {x:0,y:0};
-        this.cellSize.x = windowWidth/5;
+        this.cellPadding = windowWidth*0.015;
+        this.cellSize.x = windowWidth/5 - this.cellPadding;
         this.cellSize.y = this.cellSize.x * 0.7;
-        this.cellPadding = 2;
         this.offset = {x:-this.cellSize.x,y:-this.cellSize.y};
         this.child_offset = this.cellSize.x * 0.08;
         this.root.style.width = (this.cellSize.x + this.cellPadding) * (this.width ) + "px";
@@ -82,8 +88,8 @@ class MultiKeyboard {
         root.classList.add("keyboard-panel");
         root.style.width = this.cellSize.x * 3 + "px";
         root.style.height = this.cellSize.y * 3 + "px";
-        root.style.top = y*(this.cellSize.y + this.cellPadding) + this.offset.y + "px";
-        root.style.left = x*(this.cellSize.x + this.cellPadding) + this.offset.x + "px";
+        root.style.top = this.cellPadding/2 + y*(this.cellSize.y + this.cellPadding) + this.offset.y + "px";
+        root.style.left = this.cellPadding/2 + x*(this.cellSize.x + this.cellPadding) + this.offset.x + "px";
         let panel = {};
         panel.x = x;
         panel.y = y;
@@ -205,7 +211,7 @@ class MultiKeyboard {
             this.ctrlItem.element.classList.remove("keyboard-item-select");
             this.ctrlItem.element.classList.add("keyboard-item-select");
             this.updatePanel(this.ctrlItem.parent,x,y,true);
-            console.log(`onMouseDown: ${item.type} ${x},${y}`);
+            //console.log(`onMouseDown: ${item.type} ${x},${y}`);
         }
     }
     onMouseUp(item,x,y){
@@ -215,7 +221,7 @@ class MultiKeyboard {
             this.updatePanel(this.ctrlItem.parent,x,y,false);
             this.endPos = {x:x,y:y};
             this.currentPos = {x:x,y:y};
-            console.log(`onMouseUp: ${item.type} ${x},${y}`);
+            //console.log(`onMouseUp: ${item.type} ${x},${y}`);
             this.ctrlItem = null;
         }
     }
@@ -224,7 +230,7 @@ class MultiKeyboard {
         {
             this.updatePanel(this.ctrlItem.parent,x,y,true);
             this.currentPos = {x:x,y:y};
-            console.log(`onMouseMove: ${item.type} ${x},${y}`);
+            //console.log(`onMouseMove: ${item.type} ${x},${y}`);
         }
     }
     isInside(element, x, y) {
@@ -261,7 +267,7 @@ class MultiKeyboard {
             let rate = this.getInsideRate(panel.element, x,y);
             let normalRate = normalize(rate.x*2-1,rate.y*2-1);
             let angle = calcAngle(normalRate.x,-normalRate.y);
-            console.log(angle)
+            //console.log(angle)
             let way = "center";
             if(rate.x >= 0.34 && rate.x < 0.67 && rate.y >= 0.34 && rate.y < 0.67){
                 way = "center";
@@ -314,18 +320,3 @@ class MultiKeyboard {
         return 0;
     }
 }
-
-let keyboard = null;
-let onloadAsync = async () => {
-    const response = await fetch("./assets/flick_keyboard_mml.json");
-    let txt = await response.text();
-    keyboard.loadJson(txt);
-};
-
-window.onload = (ev) => {
-    keyboard = new MultiKeyboard("keyboard");
-    onloadAsync();
-}
-window.onresize = () => {
-    keyboard.onResize();
-};
