@@ -6,6 +6,10 @@ const REGEX_OCT_PLUS = new RegExp(/^oct\+/g);
 const REGEX_OCT_MINUS = new RegExp(/^oct\-/g);
 const REGEX_KEY_PLUS = new RegExp(/^key\+/g);
 const REGEX_KEY_MINUS = new RegExp(/^key\-/g);
+const REGEX_SCALE= new RegExp(/^scale$/g);
+const REGEX_SCALE_PLUS = new RegExp(/^scale\+/g);
+const REGEX_SCALE_MINUS = new RegExp(/^scale\-/g);
+const REGEX_SCALE_RESET = new RegExp(/^scalereset/g);
 
 let keyboard = null;
 let player = null;
@@ -22,6 +26,7 @@ let asyncInit = async () => {
     player = new SoundPlayer();
 
     keyboard = new MultiKeyboard("keyboard");
+    keyboard.enableLog = true;
     keyboard.textCustomFunc = (param, x,y,type) => {
         if(!param) return;
         if(param.value.match(REGEX_NOTE) || param.value.match(REGEX_NOTE_OCT_PLUS))
@@ -32,8 +37,11 @@ let asyncInit = async () => {
                 val = param.value.match(REGEX_NOTE_START_WITH)[0];
                 addOct = Number(param.value.match(REGEX_NOTE_NUM)[0]);
             }
-            let noteNumber = noteStrToNoteNumber(val,player.octave + addOct) + player.key;
+            let noteNumber = noteStrToNoteNumber(val,player.octave + addOct) + player.calcKey();
             return mtoco(noteNumber);
+        }
+        else if(param.value.match(REGEX_SCALE)){
+            return param.text + " " + scaleToStartNote(player.scale);
         }
         return param.text;
     };
@@ -46,19 +54,19 @@ let asyncInit = async () => {
                 addOct = Number(val.match(REGEX_NOTE_NUM)[0]);
                 val = val.match(REGEX_NOTE_START_WITH)[0];
                 if(type == "down"){
-                    player.loadAsync(() => player.onNoteAttack(noteStrToNoteNumber(val,player.octave + addOct) + player.key, player.velocity));
+                    player.loadAsync(() => player.onNoteAttack(noteStrToNoteNumber(val,player.octave + 1 + addOct) + player.calcKey(), player.velocity));
                 }
                 else{
-                    player.loadAsync(() => player.onNoteRelease(noteStrToNoteNumber(val,player.octave + addOct)+ player.key));
+                    player.loadAsync(() => player.onNoteRelease(noteStrToNoteNumber(val,player.octave + 1 + addOct)+ player.calcKey()));
                 }
             }
             else if(val.match(REGEX_NOTE))
             {
                 if(type == "down"){
-                    player.loadAsync(() => player.onNoteAttack(noteStrToNoteNumber(val,player.octave)+ player.key, player.velocity));
+                    player.loadAsync(() => player.onNoteAttack(noteStrToNoteNumber(val,player.octave + 1)+ player.calcKey(), player.velocity));
                 }
                 else{
-                    player.loadAsync(() => player.onNoteRelease(noteStrToNoteNumber(val,player.octave)+ player.key));
+                    player.loadAsync(() => player.onNoteRelease(noteStrToNoteNumber(val,player.octave + 1)+ player.calcKey()));
                 }
             }
             else if(val.match(REGEX_OCT_PLUS)){
@@ -85,6 +93,24 @@ let asyncInit = async () => {
                 sliders["key"].slider.value = player.key;
                 sliders["key"].value.textContent = player.key;
             }
+            else if(val.match(REGEX_SCALE_PLUS)){
+                player.scale = Math.min(player.scale + 1, 6);
+                keyboard.updateText();
+                sliders["scale"].slider.value = player.scale;
+                sliders["scale"].value.textContent = player.scale;
+            }
+            else if(val.match(REGEX_SCALE_MINUS)){
+                player.scale = Math.max(player.scale - 1, -6);
+                keyboard.updateText();
+                sliders["scale"].slider.value = player.scale;
+                sliders["scale"].value.textContent = player.scale;
+            }
+            else if(val.match(REGEX_SCALE_RESET)){
+                player.scale = 0;
+                keyboard.updateText();
+                sliders["scale"].slider.value = player.scale;
+                sliders["scale"].value.textContent = player.scale;
+            }
         }
     };
     await loadJsonAsync("./../flick_keyboard/assets/flick_keyboard_mml.json");
@@ -103,6 +129,7 @@ let asyncInit = async () => {
     };
     setupSlider("octave",(val)=>{player.octave=Number(val);});
     setupSlider("key",(val)=>{player.key=Number(val);});
+    setupSlider("scale",(val)=>{player.scale=Number(val);});
 }
 
 window.onload = (ev) => {

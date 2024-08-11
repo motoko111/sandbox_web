@@ -24,7 +24,10 @@ const SOUND_MAP_MINUS_TO_PLUS = {
     'g':'g',
     'g+':'g+',
 };
+//-3
 const KEYBOARD_SIZE_MAP = [];
+const SCALE_TO_KEY = [-6,1,-4,3,-2,-7,0,7,2,9,4,11,6]
+const SCALE_NOTE = ['Dm','Bbm','Fm','Cm','Gm','Dm','C','G','D','A','E','B','F#']
 
 
 function mtof(noteNumber) {
@@ -100,4 +103,11 @@ function toNoteNumber(mtoco_str){
 
 function getCurrentTime(){
     return Tone.context.currentTime;
+}
+
+function scaleTokey(scale){
+    return SCALE_TO_KEY[scale+6]
+}
+function scaleToStartNote(scale){
+    return SCALE_NOTE[scale+6];
 }

@@ -4,6 +4,7 @@ class SoundPlayer{
         this.isEnablePlay = true;
         this.octave = 5;
         this.key = 0;
+        this.scale = 0;
         this.velocity = 100;
         this.synths = [];
         this.synthMap = {};
@@ -13,11 +14,11 @@ class SoundPlayer{
         this.initSynths();
     }
     async loadAsync(callback) {
-        if(!this.finishedLoad){
-            await this.start();
-            this.finishedLoad = true;
-        }
+        await this.start();
         if(callback) callback();
+    }
+    calcKey(){
+        return this.key + scaleTokey(this.scale);
     }
     onNoteAttack(note, velocity){
         let info = this.getSynth();

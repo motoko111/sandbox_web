@@ -10,7 +10,7 @@
         [{"text":"a","value":"a2","triggerType":"multi"}],
         [{"text":"b","value":"b2","triggerType":"multi"}],
         
-        [""],
+        ["scale",null,{"text":"scale#","value":"scale+"},{"text":"reset","value":"scalereset"},{"text":"scale♭","value":"scale-"}],
         [{"text":"c","value":"c2","triggerType":"multi"}],
         [{"text":"d","value":"d2","triggerType":"multi"}],
         [{"text":"e","value":"e2","triggerType":"multi"}],

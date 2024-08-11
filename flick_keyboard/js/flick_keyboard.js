@@ -32,6 +32,9 @@ let calcAngle = (x,y) => {
 class MultiKeyboard {
     constructor(rootId){
         this.root = document.getElementById(rootId);
+        this.enableLog = false;
+        this.keyboard_console_log = document.getElementById("keyboard_console_log");
+        this.keyboard_console_logs = [];
         this.width = 5;
         this.height = 4;
         this.params = [["あ","い","う","え","お"]];
@@ -46,6 +49,19 @@ class MultiKeyboard {
         };
         this.textCustomFunc = null;
         this.create();
+    }
+    log(txt){
+        if(!this.enableLog) return;
+        console.log(txt);
+        this.keyboard_console_logs.push(txt);
+        if(this.keyboard_console_logs.length > 10) this.keyboard_console_logs.splice(0,this.keyboard_console_logs.length-10);
+        if(this.keyboard_console_log){
+            let _this = this;
+            this.keyboard_console_log.innerHTML = "";
+            this.keyboard_console_logs.forEach((t)=>{
+                _this.keyboard_console_log.innerHTML += t + "</br>"
+            });
+        }
     }
     loadJson(json){
         let obj = JSON.parse(json);
@@ -205,7 +221,10 @@ class MultiKeyboard {
         */
         item.element.ontouchstart = (e) => {
             e.preventDefault();
-            for(let i = 0; i < e.changedTouches.length; ++i) _this.onMouseDown(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+            for(let i = 0; i < e.changedTouches.length; ++i) {
+                _this.log(e.changedTouches[i].target.innerHTML);
+                _this.onMouseDown(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+            }
         };
         item.element.ontouchend = (e) => {
             e.preventDefault();
