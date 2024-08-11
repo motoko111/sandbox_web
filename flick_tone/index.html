@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>sandbox</title>
+</head>
+<body>
+    <link rel="stylesheet" href="../flick_keyboard/css/flick_keyboard.css">
+    <script src="lib/Tone.js"></script>
+    <script src="js/sound_common.js"></script>
+    <script src="js/sound_player.js"></script>
+    <script src="../flick_keyboard/js/flick_keyboard.js"></script>
+    <script src="js/flick_tone.js"></script>
+    
+    <div class="slider">
+        <label id="octave_label">octave</label>
+        <input id="octave_slider" type="range" min="0" max="12"/>
+        <label id="octave_value">4</label>
+    </div>
+    <div class="slider">
+        <label id="key_label">key</label>
+        <input id="key_slider" type="range" min="-12" max="12"/>
+        <label id="key_value">0</label>
+    </div>
+    <div class="footer">
+        <div id="keyboard" class="keyboard">
+        </div>
+    </div>
+</body>
+</html>

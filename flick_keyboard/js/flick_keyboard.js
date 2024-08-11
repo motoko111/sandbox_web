@@ -44,6 +44,7 @@ class MultiKeyboard {
         this.defaultKeyEvent = (txt) => {
             console.log(txt);
         };
+        this.textCustomFunc = null;
         this.create();
     }
     loadJson(json){
@@ -90,6 +91,20 @@ class MultiKeyboard {
         this.root.style.width = (this.cellSize.x + this.cellPadding) * (this.width ) + "px";
         this.root.style.height = (this.cellSize.y + this.cellPadding) * (this.height ) + "px";
     }
+    // テキスト描画の更新
+    updateText(){
+        let types = ["center","up","down","left","right"];
+        this.panels.forEach((panel) => {
+            types.forEach((type) => {
+                let param = this.getItemParam(panel.x, panel.y, type);
+                if(!param) return;
+                let item = panel.items[type];
+                if(!item) return;
+                item.element.textContent = param.text;
+                if(this.textCustomFunc) item.element.textContent = this.textCustomFunc(param, panel.x,panel.y,type);
+            });
+        });
+    }
     createPanel(x,y){
         let root = document.createElement("div");
         root.classList.add("keyboard-panel");
@@ -123,6 +138,7 @@ class MultiKeyboard {
         let widthRate = param.width ? param.width : 1;
         let heightRate = param.height ? param.height : 1;
         let root = document.createElement("div");
+        if(this.textCustomFunc) txt = this.textCustomFunc(param, panel.x,panel.y,type);
         root.textContent = txt;
         root.style.width = this.cellSize.x * widthRate + (this.cellPadding * (widthRate - 1))+ "px";
         root.style.height = this.cellSize.y * heightRate + (this.cellPadding * (heightRate - 1))+ "px";
@@ -318,6 +334,7 @@ class MultiKeyboard {
                 }
             }
             this.ctrlKeyInfos[panel.items["center"]].wayItem = null;
+            if(!panel.items[way]) way = "center";
             if(panel.items[way]) {
                 panel.items[way].element.classList.remove("hidden");
                 this.ctrlKeyInfos[panel.items["center"]].wayItem = panel.items[way];
