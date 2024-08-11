@@ -54,7 +54,7 @@ class MultiKeyboard {
         if(!this.enableLog) return;
         console.log(txt);
         this.keyboard_console_logs.push(txt);
-        if(this.keyboard_console_logs.length > 10) this.keyboard_console_logs.splice(0,this.keyboard_console_logs.length-10);
+        if(this.keyboard_console_logs.length > 20) this.keyboard_console_logs.splice(0,this.keyboard_console_logs.length-20);
         if(this.keyboard_console_log){
             let _this = this;
             this.keyboard_console_log.innerHTML = "";
@@ -222,21 +222,30 @@ class MultiKeyboard {
         item.element.ontouchstart = (e) => {
             e.preventDefault();
             for(let i = 0; i < e.changedTouches.length; ++i) {
-                _this.log(e.changedTouches[i].target.innerHTML);
+                _this.log(e.changedTouches[i].target.innerHTML + " start");
                 _this.onMouseDown(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
             }
         };
         item.element.ontouchend = (e) => {
             e.preventDefault();
-            for(let i = 0; i < e.changedTouches.length; ++i) _this.onMouseUp(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+            for(let i = 0; i < e.changedTouches.length; ++i) {
+                _this.log(e.changedTouches[i].target.innerHTML + " end");
+                _this.onMouseUp(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+            }
         };
         item.element.ontouchmove = (e) => {
             e.preventDefault();
-            for(let i = 0; i < e.changedTouches.length; ++i) _this.onMouseMove(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+            for(let i = 0; i < e.changedTouches.length; ++i) {
+                _this.log(e.changedTouches[i].target.innerHTML + " move");
+                _this.onMouseMove(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+            }
         };
         item.element.ontouchcancel = (e) => {
             e.preventDefault();
-            for(let i = 0; i < e.changedTouches.length; ++i) _this.onMouseUp(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+            for(let i = 0; i < e.changedTouches.length; ++i) {
+                _this.log(e.changedTouches[i].target.innerHTML + " cancel");
+                _this.onMouseUp(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+            }
         };
     }
     onResize(){
@@ -250,8 +259,8 @@ class MultiKeyboard {
             ctrlInfo = this.ctrlKeyInfos[item];
             ctrlInfo.item = item;
             let ctrlItem = ctrlInfo.item;
-            this.startPos = {x:x,y:y};
-            this.currentPos = {x:x,y:y};
+            ctrlInfo.startPos = {x:x,y:y};
+            ctrlInfo.currentPos = {x:x,y:y};
             ctrlItem.element.classList.remove("keyboard-item-select");
             ctrlItem.element.classList.add("keyboard-item-select");
             this.updatePanel(ctrlItem.parent,x,y,true);
@@ -272,8 +281,8 @@ class MultiKeyboard {
                 }
                 ctrlItem.element.classList.remove("keyboard-item-select");
                 this.updatePanel(ctrlItem.parent,x,y,false);
-                this.endPos = {x:x,y:y};
-                this.currentPos = {x:x,y:y};
+                ctrlInfo.endPos = {x:x,y:y};
+                ctrlInfo.currentPos = {x:x,y:y};
                 //console.log(`onMouseUp: ${item.type} ${x},${y}`);
                 ctrlItem = null;
                 this.ctrlKeyInfos[item] = null;
@@ -287,7 +296,7 @@ class MultiKeyboard {
             if(ctrlItem)
             {
                 this.updatePanel(ctrlItem.parent,x,y,true);
-                this.currentPos = {x:x,y:y};
+                ctrlInfo.currentPos = {x:x,y:y};
                 //console.log(`onMouseMove: ${item.type} ${x},${y}`);
             }
         }
