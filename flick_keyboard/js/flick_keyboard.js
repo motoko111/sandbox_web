@@ -54,7 +54,7 @@ class MultiKeyboard {
         if(!this.enableLog) return;
         console.log(txt);
         this.keyboard_console_logs.push(txt);
-        if(this.keyboard_console_logs.length > 20) this.keyboard_console_logs.splice(0,this.keyboard_console_logs.length-20);
+        if(this.keyboard_console_logs.length > 15) this.keyboard_console_logs.splice(0,this.keyboard_console_logs.length-15);
         if(this.keyboard_console_log){
             let _this = this;
             this.keyboard_console_log.innerHTML = "";
@@ -223,28 +223,32 @@ class MultiKeyboard {
             e.preventDefault();
             for(let i = 0; i < e.changedTouches.length; ++i) {
                 _this.log(e.changedTouches[i].target.innerHTML + " start");
-                _this.onMouseDown(e.changedTouches[i].target,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+                if(item.element != e.changedTouches[i].target) continue;
+                _this.onMouseDown(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
             }
         };
         item.element.ontouchend = (e) => {
             e.preventDefault();
             for(let i = 0; i < e.changedTouches.length; ++i) {
                 _this.log(e.changedTouches[i].target.innerHTML + " end");
-                _this.onMouseUp(e.changedTouches[i].target,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+                if(item.element != e.changedTouches[i].target) continue;
+                _this.onMouseUp(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
             }
         };
         item.element.ontouchmove = (e) => {
             e.preventDefault();
             for(let i = 0; i < e.changedTouches.length; ++i) {
                 _this.log(e.changedTouches[i].target.innerHTML + " move");
-                _this.onMouseMove(e.changedTouches[i].target,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+                if(item.element != e.changedTouches[i].target) continue;
+                _this.onMouseMove(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
             }
         };
         item.element.ontouchcancel = (e) => {
             e.preventDefault();
             for(let i = 0; i < e.changedTouches.length; ++i) {
                 _this.log(e.changedTouches[i].target.innerHTML + " cancel");
-                _this.onMouseUp(e.changedTouches[i].target,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+                if(item.element != e.changedTouches[i].target) continue;
+                _this.onMouseUp(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
             }
         };
     }
