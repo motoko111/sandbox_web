@@ -77,6 +77,7 @@ class MultiKeyboard {
             this.root.removeChild( this.root.firstChild );
         }
         this.panels = [];
+        this.itemElementMap = {};
         for(let i = 0; i < this.width * this.height; ++i) this.panels[i] = null;
         for(let y = 0; y < this.height; y++){
             for(let x = 0; x < this.width; x++){
@@ -156,6 +157,7 @@ class MultiKeyboard {
         let root = document.createElement("div");
         if(this.textCustomFunc) txt = this.textCustomFunc(param, panel.x,panel.y,type);
         root.textContent = txt;
+        root.id = "keyboard_item_" + panel.x + "_" + panel.y + "_" + type;
         root.style.width = this.cellSize.x * widthRate + (this.cellPadding * (widthRate - 1))+ "px";
         root.style.height = this.cellSize.y * heightRate + (this.cellPadding * (heightRate - 1))+ "px";
         root.classList.add("keyboard-item");
@@ -166,6 +168,7 @@ class MultiKeyboard {
         item.element = root;
         item.type = type;
         items[type] = item;
+        this.itemElementMap[item.element.id] = item;
         let offsetY = 0;
         if(type == "center"){
             this.addEvent(item);
@@ -223,32 +226,36 @@ class MultiKeyboard {
             e.preventDefault();
             for(let i = 0; i < e.changedTouches.length; ++i) {
                 _this.log(e.changedTouches[i].target.innerHTML + " start");
-                if(item.element != e.changedTouches[i].target) continue;
-                _this.onMouseDown(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+                let target = _this.itemElementMap[e.changedTouches[i].target.id];
+                if(!target) continue;
+                _this.onMouseDown(target,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
             }
         };
         item.element.ontouchend = (e) => {
             e.preventDefault();
             for(let i = 0; i < e.changedTouches.length; ++i) {
                 _this.log(e.changedTouches[i].target.innerHTML + " end");
-                if(item.element != e.changedTouches[i].target) continue;
-                _this.onMouseUp(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+                let target = _this.itemElementMap[e.changedTouches[i].target.id];
+                if(!target) continue;
+                _this.onMouseUp(target,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
             }
         };
         item.element.ontouchmove = (e) => {
             e.preventDefault();
             for(let i = 0; i < e.changedTouches.length; ++i) {
                 _this.log(e.changedTouches[i].target.innerHTML + " move");
-                if(item.element != e.changedTouches[i].target) continue;
-                _this.onMouseMove(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+                let target = _this.itemElementMap[e.changedTouches[i].target.id];
+                if(!target) continue;
+                _this.onMouseMove(target,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
             }
         };
         item.element.ontouchcancel = (e) => {
             e.preventDefault();
             for(let i = 0; i < e.changedTouches.length; ++i) {
                 _this.log(e.changedTouches[i].target.innerHTML + " cancel");
-                if(item.element != e.changedTouches[i].target) continue;
-                _this.onMouseUp(item,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
+                let target = _this.itemElementMap[e.changedTouches[i].target.id];
+                if(!target) continue;
+                _this.onMouseUp(target,e.changedTouches[i].pageX,e.changedTouches[i].pageY);
             }
         };
     }
