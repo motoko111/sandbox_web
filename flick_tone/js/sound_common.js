@@ -71,7 +71,7 @@ function mtoo(noteNumber){
 
 function createNoteNumberMap(){
     map = {}
-    for(let o = -12;o<=12;++o){
+    for(let o = -24;o<=24;++o){
         for(let i = 0;i<12;++i){
             let noteNumber = 0;
             if(i <= 2){
@@ -94,7 +94,7 @@ function noteStrToNoteNumber(note_str, oct){
 
 function toNoteNumber(mtoco_str){
     let n = NOTENUMBER_MAP[mtoco_str];
-    if(n) return n;
+    if(n != undefined) return n;
     return -1000;
 }
 

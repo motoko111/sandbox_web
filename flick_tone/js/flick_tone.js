@@ -1,6 +1,7 @@
 const REGEX_NOTE = new RegExp(/^[a-g](\+|\-)?$/g);
 const REGEX_NOTE_START_WITH = new RegExp(/^[a-g](\+|\-)?/g);
-const REGEX_NOTE_OCT_PLUS = new RegExp(/^[a-g](\+|\-)?[1]$/g);
+const REGEX_NOTE_OCT_PLUS = new RegExp(/^[a-g](\+|\-)?(\-)?[0-9]+$/g);
+const REGEX_NOTE_NUM = new RegExp(/(\-)?[0-9]+$/g);
 const REGEX_OCT_PLUS = new RegExp(/^oct\+/g);
 const REGEX_OCT_MINUS = new RegExp(/^oct\-/g);
 const REGEX_KEY_PLUS = new RegExp(/^key\+/g);
@@ -26,10 +27,12 @@ let asyncInit = async () => {
         if(param.value.match(REGEX_NOTE) || param.value.match(REGEX_NOTE_OCT_PLUS))
         {
             let val = param.value;
+            let addOct = 0;
             if(param.value.match(REGEX_NOTE_OCT_PLUS)){
                 val = param.value.match(REGEX_NOTE_START_WITH)[0];
+                addOct = Number(param.value.match(REGEX_NOTE_NUM)[0]);
             }
-            let noteNumber = noteStrToNoteNumber(val,player.octave) + player.key;
+            let noteNumber = noteStrToNoteNumber(val,player.octave + addOct) + player.key;
             return mtoco(noteNumber);
         }
         return param.text;
@@ -39,12 +42,14 @@ let asyncInit = async () => {
         }
         else{
             if(val.match(REGEX_NOTE_OCT_PLUS)){
+                let addOct = 0;
+                addOct = Number(val.match(REGEX_NOTE_NUM)[0]);
                 val = val.match(REGEX_NOTE_START_WITH)[0];
                 if(type == "down"){
-                    player.loadAsync(() => player.onNoteAttack(noteStrToNoteNumber(val,player.octave + 1) + player.key, player.velocity));
+                    player.loadAsync(() => player.onNoteAttack(noteStrToNoteNumber(val,player.octave + addOct) + player.key, player.velocity));
                 }
                 else{
-                    player.loadAsync(() => player.onNoteRelease(noteStrToNoteNumber(val,player.octave + 1)+ player.key));
+                    player.loadAsync(() => player.onNoteRelease(noteStrToNoteNumber(val,player.octave + addOct)+ player.key));
                 }
             }
             else if(val.match(REGEX_NOTE))
