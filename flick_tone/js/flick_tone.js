@@ -48,7 +48,8 @@ let asyncInit = async () => {
         }
         return param.text;
     };
-    keyboard.defaultKeyEvent = (val,type) => {
+    keyboard.defaultKeyEvent = (val,type,item,x,y) => {
+        let id = item.id;
         if(val === "del"){
         }
         else{
@@ -57,19 +58,19 @@ let asyncInit = async () => {
                 addOct = Number(val.match(REGEX_NOTE_NUM)[0]);
                 val = val.match(REGEX_NOTE_START_WITH)[0];
                 if(type == "down"){
-                    player.loadAsync(() => player.onNoteAttack(noteStrToNoteNumber(val,player.octave + 1 + addOct) + player.calcKey(), player.velocity));
+                    player.loadAsync(() => player.onNoteAttack(noteStrToNoteNumber(val,player.octave + 1 + addOct) + player.calcKey(), player.velocity, id));
                 }
                 else{
-                    player.loadAsync(() => player.onNoteRelease(noteStrToNoteNumber(val,player.octave + 1 + addOct)+ player.calcKey()));
+                    player.loadAsync(() => player.onNoteRelease(noteStrToNoteNumber(val,player.octave + 1 + addOct)+ player.calcKey(), id));
                 }
             }
             else if(val.match(REGEX_NOTE))
             {
                 if(type == "down"){
-                    player.loadAsync(() => player.onNoteAttack(noteStrToNoteNumber(val,player.octave + 1)+ player.calcKey(), player.velocity));
+                    player.loadAsync(() => player.onNoteAttack(noteStrToNoteNumber(val,player.octave + 1)+ player.calcKey(), player.velocity, id));
                 }
                 else{
-                    player.loadAsync(() => player.onNoteRelease(noteStrToNoteNumber(val,player.octave + 1)+ player.calcKey()));
+                    player.loadAsync(() => player.onNoteRelease(noteStrToNoteNumber(val,player.octave + 1)+ player.calcKey(), id));
                 }
             }
             else if(val.match(REGEX_SHARP)){

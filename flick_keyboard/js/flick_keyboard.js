@@ -283,7 +283,7 @@ class MultiKeyboard {
             ctrlItem.element.classList.add("keyboard-item-select");
             this.updatePanel(ctrlItem.parent,x,y,true);
             if(item.param.triggerType == "down" || item.param.triggerType == "multi"){
-                this.onKeyEvent(item.param.value, "down");
+                this.onKeyEvent(item.param.value, "down", item,x,y);
             }
         }
     }
@@ -295,7 +295,7 @@ class MultiKeyboard {
             {
                 let ctrlWayItem = ctrlInfo.wayItem;
                 if(ctrlWayItem && (ctrlWayItem.param.triggerType == "up" || ctrlWayItem.param.triggerType == "multi")){
-                    this.onKeyEvent(ctrlWayItem.param.value, "up");
+                    this.onKeyEvent(ctrlWayItem.param.value, "up", item,x,y);
                 }
                 ctrlItem.element.classList.remove("keyboard-item-select");
                 this.updatePanel(ctrlItem.parent,x,y,false);
@@ -319,9 +319,9 @@ class MultiKeyboard {
             }
         }
     }
-    onKeyEvent(value, type){
+    onKeyEvent(value, type, item,x,y){
         if(this.keyEvents[value]) this.keyEvents[value](type);
-        if(this.defaultKeyEvent) this.defaultKeyEvent(value, type);
+        if(this.defaultKeyEvent) this.defaultKeyEvent(value, type, item,x,y);
     }
     isInside(element, x, y) {
         // 要素の領域を取得

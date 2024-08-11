@@ -21,7 +21,7 @@ class SoundPlayer{
     calcKey(){
         return this.key + scaleTokey(this.scale) + this.sharp;
     }
-    onNoteAttack(note, velocity){
+    onNoteAttack(note, velocity, id){
         let info = this.getSynth();
         if(!info.isLoaded) {
             console.log(`Note On: ${note} not loaded.)`);
@@ -31,16 +31,18 @@ class SoundPlayer{
             console.log(`Note On: ${note} aleady used.)`);
             return;
         }
-        this.synthMap[note] = info;
+        if(id == undefined) id = note;
+        this.synthMap[id] = info;
         info.isActive = true;
         info.startTime = getCurrentTime();
         const frequency = Tone.Frequency(note, "midi").toFrequency();
         if(this.isEnablePlay) info.synth.triggerAttack(frequency, 0, 0.5 + velocity * 0.01 * 0.5);
-        console.log(`Note On: ${note} (velocity: ${velocity})`);
+        console.log(`Note On: ${note} (velocity: ${velocity}) id:${id}`);
         if(this.onNoteAttackEvent) this.onNoteAttackEvent(note);
     }
-    onNoteRelease(note){
-        let info = this.synthMap[note];
+    onNoteRelease(note, id){
+        if(id == undefined) id = note;
+        let info = this.synthMap[id];
         if(info == null) {
             console.log(`Note Off: ${note} is null.)`);
             return;
@@ -49,10 +51,10 @@ class SoundPlayer{
             console.log(`Note Off: ${note} not loaded.)`);
             return;
         }
-        this.synthMap[note] = null;
+        this.synthMap[id] = null;
         info.isActive = false;
         info.synth.triggerRelease();
-        console.log(`Note Off: ${note}`);
+        console.log(`Note Off: ${note} id:${id}`);
         if(this.onNoteReleaseEvent) this.onNoteReleaseEvent(note, getCurrentTime() - info.startTime);
     }
     createSynth(onload){
