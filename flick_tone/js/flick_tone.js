@@ -2,10 +2,13 @@ const REGEX_NOTE = new RegExp(/^[a-g](\+|\-)?$/g);
 const REGEX_NOTE_START_WITH = new RegExp(/^[a-g](\+|\-)?/g);
 const REGEX_NOTE_OCT_PLUS = new RegExp(/^[a-g](\+|\-)?(\-)?[0-9]+$/g);
 const REGEX_NOTE_NUM = new RegExp(/(\-)?[0-9]+$/g);
+const REGEX_SHARP = new RegExp(/^#/g);
 const REGEX_OCT_PLUS = new RegExp(/^oct\+/g);
 const REGEX_OCT_MINUS = new RegExp(/^oct\-/g);
+const REGEX_OCT_RESET = new RegExp(/^octreset/g);
 const REGEX_KEY_PLUS = new RegExp(/^key\+/g);
 const REGEX_KEY_MINUS = new RegExp(/^key\-/g);
+const REGEX_KEY_RESET = new RegExp(/^keyreset/g);
 const REGEX_SCALE= new RegExp(/^scale$/g);
 const REGEX_SCALE_PLUS = new RegExp(/^scale\+/g);
 const REGEX_SCALE_MINUS = new RegExp(/^scale\-/g);
@@ -69,6 +72,14 @@ let asyncInit = async () => {
                     player.loadAsync(() => player.onNoteRelease(noteStrToNoteNumber(val,player.octave + 1)+ player.calcKey()));
                 }
             }
+            else if(val.match(REGEX_SHARP)){
+                if(type == "down"){
+                    player.sharp = 1;
+                }
+                else{
+                    player.sharp = 0;
+                }
+            }
             else if(val.match(REGEX_OCT_PLUS)){
                 player.octave = Math.min(player.octave + 1, 12);
                 keyboard.updateText();
@@ -81,6 +92,12 @@ let asyncInit = async () => {
                 sliders["octave"].slider.value = player.octave;
                 sliders["octave"].value.textContent = player.octave;
             }
+            else if(val.match(REGEX_OCT_RESET)){
+                player.octave = 4;
+                keyboard.updateText();
+                sliders["octave"].slider.value = player.octave;
+                sliders["octave"].value.textContent = player.octave;
+            }
             else if(val.match(REGEX_KEY_PLUS)){
                 player.key = Math.min(player.key + 1, 12);
                 keyboard.updateText();
@@ -89,6 +106,12 @@ let asyncInit = async () => {
             }
             else if(val.match(REGEX_KEY_MINUS)){
                 player.key = Math.max(player.key - 1, -12);
+                keyboard.updateText();
+                sliders["key"].slider.value = player.key;
+                sliders["key"].value.textContent = player.key;
+            }
+            else if(val.match(REGEX_KEY_RESET)){
+                player.key = 0;
                 keyboard.updateText();
                 sliders["key"].slider.value = player.key;
                 sliders["key"].value.textContent = player.key;

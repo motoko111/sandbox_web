@@ -4,7 +4,7 @@
     "defaultTriggerType":"up",
     "params":[
 
-        [""],
+        [],
         [{"text":"f","value":"f2","triggerType":"multi"}],
         [{"text":"g","value":"g2","triggerType":"multi"}],
         [{"text":"a","value":"a2","triggerType":"multi"}],
@@ -14,31 +14,31 @@
         [{"text":"c","value":"c2","triggerType":"multi"}],
         [{"text":"d","value":"d2","triggerType":"multi"}],
         [{"text":"e","value":"e2","triggerType":"multi"}],
-        [],
+        [{"text":"#","value":"#","triggerType":"multi"}],
 
-        ["oct+"],
+        ["oct",null,{"text":"oct+","value":"oct+"},{"text":"reset","value":"octreset"},{"text":"oct-","value":"oct-"}],
         [{"text":"f","value":"f1","triggerType":"multi"}],
         [{"text":"g","value":"g1","triggerType":"multi"}],
         [{"text":"a","value":"a1","triggerType":"multi"}],
         [{"text":"b","value":"b1","triggerType":"multi"}],
         
-        ["oct-"],
+        ["key",null,{"text":"key+","value":"key+"},{"text":"reset","value":"keyreset"},{"text":"key-","value":"key-"}],
         [{"text":"c","value":"c1","triggerType":"multi"}],
         [{"text":"d","value":"d1","triggerType":"multi"}],
         [{"text":"e","value":"e1","triggerType":"multi"}],
-        [],
+        [{"text":"#","value":"#","triggerType":"multi"}],
         
-        ["key+"],
+        [],
         [{"text":"f","triggerType":"multi"}],
         [{"text":"g","triggerType":"multi"}],
         [{"text":"a","triggerType":"multi"}],
         [{"text":"b","triggerType":"multi"}],
 
-        ["key-"],
+        [],
         [{"text":"c","triggerType":"multi"}],
         [{"text":"d","triggerType":"multi"}],
         [{"text":"e","triggerType":"multi"}],
-        []
+        [{"text":"#","value":"#","triggerType":"multi"}]
         
     ]
 }

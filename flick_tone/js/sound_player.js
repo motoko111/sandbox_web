@@ -2,9 +2,10 @@
 class SoundPlayer{
     constructor(){
         this.isEnablePlay = true;
-        this.octave = 5;
+        this.octave = 4;
         this.key = 0;
         this.scale = 0;
+        this.sharp = 0;
         this.velocity = 100;
         this.synths = [];
         this.synthMap = {};
@@ -18,7 +19,7 @@ class SoundPlayer{
         if(callback) callback();
     }
     calcKey(){
-        return this.key + scaleTokey(this.scale);
+        return this.key + scaleTokey(this.scale) + this.sharp;
     }
     onNoteAttack(note, velocity){
         let info = this.getSynth();
