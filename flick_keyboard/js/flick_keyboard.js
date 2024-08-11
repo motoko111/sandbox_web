@@ -167,6 +167,7 @@ class MultiKeyboard {
         item.parent = panel;
         item.element = root;
         item.type = type;
+        item.id = root.id;
         items[type] = item;
         this.itemElementMap[item.element.id] = item;
         let offsetY = 0;
@@ -264,10 +265,10 @@ class MultiKeyboard {
         this.create();
     }
     onMouseDown(item,x,y){
-        let ctrlInfo = this.ctrlKeyInfos[item];
+        let ctrlInfo = this.ctrlKeyInfos[item.id];
         if(!ctrlInfo){
-            this.ctrlKeyInfos[item] = {};
-            ctrlInfo = this.ctrlKeyInfos[item];
+            this.ctrlKeyInfos[item.id] = {};
+            ctrlInfo = this.ctrlKeyInfos[item.id];
             ctrlInfo.item = item;
             let ctrlItem = ctrlInfo.item;
             ctrlInfo.startPos = {x:x,y:y};
@@ -281,7 +282,7 @@ class MultiKeyboard {
         }
     }
     onMouseUp(item,x,y){
-        let ctrlInfo = this.ctrlKeyInfos[item];
+        let ctrlInfo = this.ctrlKeyInfos[item.id];
         if(ctrlInfo){
             let ctrlItem = ctrlInfo.item;
             if(ctrlItem)
@@ -296,12 +297,12 @@ class MultiKeyboard {
                 ctrlInfo.currentPos = {x:x,y:y};
                 //console.log(`onMouseUp: ${item.type} ${x},${y}`);
                 ctrlItem = null;
-                this.ctrlKeyInfos[item] = null;
+                this.ctrlKeyInfos[item.id] = null;
             }
         }
     }
     onMouseMove(item,x,y){
-        let ctrlInfo = this.ctrlKeyInfos[item];
+        let ctrlInfo = this.ctrlKeyInfos[item.id];
         if(ctrlInfo){
             let ctrlItem = ctrlInfo.item;
             if(ctrlItem)
@@ -372,11 +373,11 @@ class MultiKeyboard {
                     way = "right";
                 }
             }
-            this.ctrlKeyInfos[panel.items["center"]].wayItem = null;
+            this.ctrlKeyInfos[panel.items["center"].id].wayItem = null;
             if(!panel.items[way]) way = "center";
             if(panel.items[way]) {
                 panel.items[way].element.classList.remove("hidden");
-                this.ctrlKeyInfos[panel.items["center"]].wayItem = panel.items[way];
+                this.ctrlKeyInfos[panel.items["center"].id].wayItem = panel.items[way];
             }
         }
         
