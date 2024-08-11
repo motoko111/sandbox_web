@@ -205,24 +205,30 @@ class MultiKeyboard {
     }
     addEvent(item){
         let _this = this;
-        /*
         item.element.addEventListener("pointerdown", (e) => {
             e.preventDefault();
-            _this.onMouseDown(item,e.pageX,e.pageY);
+            let target = _this.itemElementMap[e.target.id];
+            if(!target) return;
+            _this.onMouseDown(target,e.pageX,e.pageY);
         });
         item.element.addEventListener("pointerup", (e) => {
             e.preventDefault();
-            _this.onMouseUp(item,e.pageX,e.pageY);
+            let target = _this.itemElementMap[e.target.id];
+            if(!target) return;
+            _this.onMouseUp(target,e.pageX,e.pageY);
         });
         item.element.addEventListener("pointermove", (e) => {
             e.preventDefault();
-            _this.onMouseMove(item,e.pageX,e.pageY);
+            let target = _this.itemElementMap[e.target.id];
+            if(!target) return;
+            _this.onMouseMove(target,e.pageX,e.pageY);
         });
         item.element.addEventListener("pointercancel", (e) => {
             e.preventDefault();
-            _this.onMouseUp(item,e.pageX,e.pageY);
+            let target = _this.itemElementMap[e.target.id];
+            if(!target) return;
+            _this.onMouseUp(target,e.pageX,e.pageY);
         });
-        */
         item.element.ontouchstart = (e) => {
             e.preventDefault();
             for(let i = 0; i < e.changedTouches.length; ++i) {
