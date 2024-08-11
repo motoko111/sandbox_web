@@ -82,7 +82,7 @@ let asyncInit = async () => {
             }
         }
     };
-    await loadJsonAsync("../flick_keyboard/assets/flick_keyboard_mml.json");
+    await loadJsonAsync("./../flick_keyboard/assets/flick_keyboard_mml.json");
 
     let setupSlider = (v,func) => {
         let slider = document.getElementById(v + "_slider");
