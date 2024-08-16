@@ -1,72 +1,92 @@
 import * as THREE from "three";
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import GUI from 'https://cdn.jsdelivr.net/npm/lil-gui@0.19/+esm';
+import RAPIER from 'https://cdn.skypack.dev/@dimforge/rapier3d-compat';
+import { ThreePhysics } from "./three_physics.js";
+import { World } from "./ecs/world.js";
+import { PhysicsSystem } from "./ecs/systems/physics_system.js";
+import { BodyComponent } from "./ecs/components/body_component.js";
+import { RenderSystem } from "./ecs/systems/render_system.js";
+import { AddObjectTag, ObjectComponent } from "./ecs/components/object_component.js";
+import Stats from "three/addons/libs/stats.module.js";
 const clock = new THREE.Clock()
 
 class GameScene{
     constructor(){
     }
     load(){
-        // サイズを指定
-        const width = GetScreenWidth();
-        const height = GetScreenHeight();
+        let _this = this;
 
-        // レンダラーを作成
-        const canvasElement = document.querySelector('#threeCanvas')
-        this.renderer = new THREE.WebGLRenderer({
-            canvas: canvasElement,
-        });
-        this.renderer.setSize(width, height);
-
-        this.scene = new THREE.Scene();
-
-        const camera = new THREE.PerspectiveCamera(75, width / height, 1, 10000);
-        camera.position.set(0,0,10);
+        this.stats = new Stats();
+        this.stats.showPanel(0);
+        document.body.appendChild(this.stats.dom);
+        
+        this.world = new World();
+        let em = this.world.entityManager;
+        this.world.createSystem(PhysicsSystem, em);
+        this.world.createSystem(RenderSystem, em);
+        let entity = em.createEntity();
+        let body = em.addComponent(entity, BodyComponent);
 
         const light = new THREE.DirectionalLight(0xffffff, 1);
         light.position.set(0, 0, 100).normalize();
-        this.scene.add(light);
+        _this.addEntity(light);
 
-        const controls = new OrbitControls(camera, canvasElement);
+        let floor = () => {
+            const mesh = new THREE.Mesh(
+            new THREE.BoxGeometry(100, 1, 100),
+            new THREE.MeshNormalMaterial());
 
-        const gridHelper = new THREE.GridHelper(50,50);
-        this.scene.add(gridHelper);
+            let entity = _this.addEntity(mesh);
+            let body = em.addComponent(entity, BodyComponent, "fixed", "box", 50, 0.5, 50);
+            body.collider.setTranslation(0,0,0);
+            return mesh;
+        };
+        floor();
 
-        const axesHelper = new THREE.AxesHelper(180);
-        this.scene.add(axesHelper);
+        let box = () => {
+            const mesh = new THREE.Mesh(
+            new THREE.BoxGeometry(1, 1, 1),
+            new THREE.MeshNormalMaterial());
 
-        const directionalLightHelper = new THREE.DirectionalLightHelper(light, 1);
-        //scene.add(directionalLightHelper);
-
-        const mesh = new THREE.Mesh(
-        new THREE.BoxGeometry(1, 1, 1),
-        new THREE.MeshNormalMaterial());
-        this.scene.add(mesh);
-
-        this.camera = camera;
-        this.light = light;
-        this.controls = controls;
+            let entity = _this.addEntity(mesh);
+            let body = em.addComponent(entity, BodyComponent, "dynamic", "box", 0.5, 0.5, 0.5);
+            body.setPosition(Math.random() * 20 - 10,Math.random() * 10,Math.random() * 20 - 10);
+            return mesh;
+        };
+        for(let i = 0; i < 800; i++) box();
 
         this.setupDebug();
     }
+    addEntity(obj){
+        let em = this.world.entityManager;
+        let entity = em.createEntity();
+        em.addComponent(entity, ObjectComponent, obj);
+        em.addComponent(entity, AddObjectTag);
+        return entity;
+    }
     setupDebug(){
         let gui = new GUI();
-        const folder = gui.addFolder( 'camera' );
-        folder.add(this.camera.position, 'x', -10, 10).onChange(v => {
-
-        });
-        folder.add(this.camera.position, 'y', -10, 10).onChange(v => {
-
-        });
-        folder.add(this.camera.position, 'z', -10, 10).onChange(v => {
-
-        });
-        gui.add(folder);
+        if(false){
+            const folder = gui.addFolder( 'camera.position' );
+            folder.add(this.camera.position, 'x', -10, 10);
+            folder.add(this.camera.position, 'y', -10, 10);
+            folder.add(this.camera.position, 'z', -10, 1000);
+            gui.add(folder);
+        }
+        if(false){
+            const folder = gui.addFolder( 'light.rotation' );
+            folder.add(this.light.rotation, 'x', -1, 1);
+            folder.add(this.light.rotation, 'y', -1, 1);
+            folder.add(this.light.rotation, 'z', -1, 1);
+            gui.add(folder);
+        }
     }
     update(dt){
+        this.stats.begin();
+        this.world.update();
+        this.stats.end();
     }
     draw(){
-        this.renderer.render(this.scene, this.camera);
     }
     destroy(){
     }
@@ -80,7 +100,23 @@ class GameScene{
 class ThreeGameEngine {
     constructor(){
         this.gameScene = new GameScene();
+    }
+    static createInstance(){
+        ThreeGameEngine.instance = new ThreeGameEngine();
+        return ThreeGameEngine.instance;
+    }
+    static getInstance(){
+        if(ThreeGameEngine.instance){
+            return ThreeGameEngine.instance;
+        }
+        return ThreeGameEngine.createInstance();
+    }
+    async init(){
+        ThreePhysics.createInstance();
+        await ThreePhysics.getInstance().init();
+
         this.gameScene.load();
+
         SetElapsedTime(0);
         let _this = this;
         let tick = () => {

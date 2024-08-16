@@ -1,10 +1,8 @@
 import {ThreeGameEngine} from "./three_game.js";
 
-let engine = null;
-
-window.addEventListener("load",() => {
-    engine = new ThreeGameEngine();
+window.addEventListener("load",async () => {
+    await ThreeGameEngine.getInstance().init();
 });
 window.addEventListener("resize",()=>{
-    engine.onResize(window.innerWidth, window.innerHeight);
+    ThreeGameEngine.getInstance().onResize(window.innerWidth, window.innerHeight);
 });
