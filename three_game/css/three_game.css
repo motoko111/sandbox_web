@@ -9,4 +9,5 @@ canvas {
     display: block; /* canvasのデフォルトのインラインスペースを消す */
     margin: 0;
     padding: 0;
+    user-select: none;
 }

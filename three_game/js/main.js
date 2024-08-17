@@ -45,35 +45,31 @@ document.addEventListener("wheel", (e) => {
     e.preventDefault();
     engine.wheelmoved(e.deltaX,e.deltaY);
 });
-document.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    for (let i = 0; i < e.touches.length; i++) {
-        const touch = e.touches[i];
-        lastTouchPositions[touch.identifier] = { x: touch.clientX, y: touch.clientY };
-        if(touch.identifier == 0) engine.mousepressed(touch.clientX,touch.clientY,0);
+document.addEventListener("pointerdown", (e) => {
+    if(e.pointerType === 'touch'){
+        e.preventDefault();
+        lastTouchPositions[e.pointerId] = { x: e.clientX, y: e.clientY };
+        engine.mousepressed(e.clientX,e.clientY,0);
     }
-}, true);
-document.addEventListener("touchend", (e) => {
-    e.preventDefault();
-    for (let i = 0; i < e.changedTouches.length; i++) {
-        const touch = e.changedTouches[i];
-        lastTouchPositions[touch.identifier] = undefined;
-        if(touch.identifier == 0) engine.mousereleased(touch.clientX,touch.clientY,0);
+});
+document.addEventListener("pointerup", (e) => {
+    if(e.pointerType === 'touch'){
+        e.preventDefault();
+        delete lastTouchPositions[e.pointerId];
+        engine.mousereleased(e.clientX,e.clientY,0);
     }
-}, true);
-document.addEventListener("touchmove", (e) => {
-    e.preventDefault();
-    for (let i = 0; i < e.touches.length; i++) {
-        const touch = e.touches[i];
-        let lastPosition = lastTouchPositions[touch.identifier];
-
+});
+document.addEventListener("pointermove", (e) => {
+    if(e.pointerType === 'touch'){
+        e.preventDefault();
+        let lastPosition = lastTouchPositions[e.pointerId];
         if (lastPosition) {
-            const deltaX = touch.clientX - lastPosition.x;
-            const deltaY = touch.clientY - lastPosition.y;
-            lastPosition.x = touch.clientX;
-            lastPosition.y = touch.clientY;
-            lastTouchPositions[touch.identifier] = lastPosition;
-            if(touch.identifier == 0) engine.mousemoved(touch.clientX, touch.clientY, deltaX, deltaY);
+            const deltaX = e.clientX - lastPosition.x;
+            const deltaY = e.clientY - lastPosition.y;
+            lastPosition.x = e.clientX;
+            lastPosition.y = e.clientY;
+            lastTouchPositions[e.pointerId] = lastPosition;
+            engine.mousemoved(e.clientX, e.clientY, deltaX, deltaY);
         }
     }
-}, true);
+});
