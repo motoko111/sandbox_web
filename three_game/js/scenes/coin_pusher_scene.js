@@ -119,17 +119,28 @@ export class CoinPusherScene extends GameScene{
     setupDebug(){
         let gui = new GUI();
         let em = this.world.entityManager;
+        this.guiParam = {};
+        this.updateDebug();
         if(true){
             const folder = gui.addFolder( 'entity' );
             folder.add(em.entities, 'length').listen().disable();
         }
         if(true){
+            //const folder = gui.addFolder( 'component' );
+            //folder.add(this.guiParam, 'BodyComponent').listen().disable();
+        }
+        if(true){
             const folder = gui.addFolder( 'game' );
             folder.add(this, 'score').listen().disable();
         }
+        this.updateDebug();
+    }
+    updateDebug(){
+        let em = this.world.entityManager;
     }
     update(dt){
         super.update(dt);
+        this.updateDebug();
     }
     onDestroy(){
         ThreeRender.getInstance().clear();

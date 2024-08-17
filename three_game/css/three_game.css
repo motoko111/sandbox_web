@@ -1,0 +1,11 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* スクロールバーも消す */
+    height: 100%;
+}
+canvas {
+    display: block; /* canvasのデフォルトのインラインスペースを消す */
+    margin: 0;
+    padding: 0;
+}
