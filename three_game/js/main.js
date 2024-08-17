@@ -46,7 +46,7 @@ document.addEventListener("wheel", (e) => {
     engine.wheelmoved(e.deltaX,e.deltaY);
 });
 document.addEventListener("touchstart", (e) => {
-    //e.preventDefault();
+    e.preventDefault();
     for (let i = 0; i < e.touches.length; i++) {
         const touch = e.touches[i];
         lastTouchPositions[touch.identifier] = { x: touch.clientX, y: touch.clientY };
@@ -54,7 +54,7 @@ document.addEventListener("touchstart", (e) => {
     }
 }, true);
 document.addEventListener("touchend", (e) => {
-    //e.preventDefault();
+    e.preventDefault();
     for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
         lastTouchPositions[touch.identifier] = undefined;
@@ -62,7 +62,7 @@ document.addEventListener("touchend", (e) => {
     }
 }, true);
 document.addEventListener("touchmove", (e) => {
-    //e.preventDefault();
+    e.preventDefault();
     for (let i = 0; i < e.touches.length; i++) {
         const touch = e.touches[i];
         let lastPosition = lastTouchPositions[touch.identifier];

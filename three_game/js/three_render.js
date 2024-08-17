@@ -41,7 +41,7 @@ class ThreeRender {
         this.scene.add(this.camera);
 
         // カメラ操作
-        this.controls = new OrbitControls(this.camera, canvasElement);
+        //this.controls = new OrbitControls(this.camera, canvasElement);
 
         // グリッド
         this.gridHelper = new THREE.GridHelper(50,50);
