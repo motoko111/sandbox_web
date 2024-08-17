@@ -3,6 +3,7 @@ body, html {
     padding: 0;
     overflow: hidden; /* スクロールバーも消す */
     height: 100%;
+    user-select: none;
 }
 canvas {
     display: block; /* canvasのデフォルトのインラインスペースを消す */
