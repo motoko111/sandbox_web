@@ -36,9 +36,36 @@ export class BodyComponent extends Component {
                 this.shape = RAPIER.ColliderDesc.heightfield(args[0],args[1],args[2],args[3]);
             }break;
         }
+        this.shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
         this.collider = world.createCollider(this.shape, this.rigidbody);
+
+        this.tempVec3 = {x:0,y:0,z:0};
     }
+    // 位置
     setPosition(x,y,z){
-        this.rigidbody.setTranslation({x:x,y:y,z:z});
+        this.tempVec3.x = x;
+        this.tempVec3.y = y;
+        this.tempVec3.z = z;
+        this.rigidbody.setTranslation(this.tempVec3);
+    }
+    // 速度
+    setVelocity(x,y,z){
+        this.tempVec3.x = x;
+        this.tempVec3.y = y;
+        this.tempVec3.z = z;
+        this.rigidbody.setLinvel(this.tempVec3, true);
+    }
+    // 加速度
+    setAccelerator(x,y,z){
+        this.tempVec3.x = x;
+        this.tempVec3.y = y;
+        this.tempVec3.z = z;
+    }
+    // 角速度
+    setAngleVelocity(x,y,z){
+        this.tempVec3.x = x;
+        this.tempVec3.y = y;
+        this.tempVec3.z = z;
+        this.rigidbody.setAngvel(this.tempVec3, true);
     }
 }

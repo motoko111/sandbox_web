@@ -6,100 +6,117 @@ import { World } from "./ecs/world.js";
 import { PhysicsSystem } from "./ecs/systems/physics_system.js";
 import { BodyComponent } from "./ecs/components/body_component.js";
 import { RenderSystem } from "./ecs/systems/render_system.js";
-import { AddObjectTag, ObjectComponent } from "./ecs/components/object_component.js";
+import { AddObjectTag, ObjectComponent, DeleteObjectTag } from "./ecs/components/object_component.js";
 import Stats from "three/addons/libs/stats.module.js";
+import { ThreeRender } from "./three_render.js";
+import { Input } from "./input.js";
 const clock = new THREE.Clock()
 
 class GameScene{
     constructor(){
-    }
-    load(){
-        let _this = this;
-
+        this.world = new World();
         this.stats = new Stats();
         this.stats.showPanel(0);
         document.body.appendChild(this.stats.dom);
-        
-        this.world = new World();
-        let em = this.world.entityManager;
-        this.world.createSystem(PhysicsSystem, em);
-        this.world.createSystem(RenderSystem, em);
-        let entity = em.createEntity();
-        let body = em.addComponent(entity, BodyComponent);
-
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(0, 0, 100).normalize();
-        _this.addEntity(light);
-
-        let floor = () => {
-            const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(100, 1, 100),
-            new THREE.MeshNormalMaterial());
-
-            let entity = _this.addEntity(mesh);
-            let body = em.addComponent(entity, BodyComponent, "fixed", "box", 50, 0.5, 50);
-            body.collider.setTranslation(0,0,0);
-            return mesh;
-        };
-        floor();
-
-        let box = () => {
-            const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(1, 1, 1),
-            new THREE.MeshNormalMaterial());
-
-            let entity = _this.addEntity(mesh);
-            let body = em.addComponent(entity, BodyComponent, "dynamic", "box", 0.5, 0.5, 0.5);
-            body.setPosition(Math.random() * 20 - 10,Math.random() * 10,Math.random() * 20 - 10);
-            return mesh;
-        };
-        for(let i = 0; i < 800; i++) box();
-
-        this.setupDebug();
     }
+    async load(){
+    }
+    // シーンに追加
     addEntity(obj){
         let em = this.world.entityManager;
         let entity = em.createEntity();
         em.addComponent(entity, ObjectComponent, obj);
-        em.addComponent(entity, AddObjectTag);
+        ThreeRender.getInstance().scene.add(obj);
         return entity;
     }
-    setupDebug(){
-        let gui = new GUI();
-        if(false){
-            const folder = gui.addFolder( 'camera.position' );
-            folder.add(this.camera.position, 'x', -10, 10);
-            folder.add(this.camera.position, 'y', -10, 10);
-            folder.add(this.camera.position, 'z', -10, 1000);
-            gui.add(folder);
+    // シーンから削除
+    destroyEntity(entity){
+        let em = this.world.entityManager;
+        let obj = em.getComponent(entity,ObjectComponent);
+        if(obj){
+            if(typeof obj == THREE.Mesh){
+                if(obj.material){
+                    obj.material.dispose();
+                }
+                if(obj.geometry){
+                    obj.geometry.dispose();
+                }
+            }
+            ThreeRender.getInstance().scene.remove(obj);
         }
-        if(false){
-            const folder = gui.addFolder( 'light.rotation' );
-            folder.add(this.light.rotation, 'x', -1, 1);
-            folder.add(this.light.rotation, 'y', -1, 1);
-            folder.add(this.light.rotation, 'z', -1, 1);
-            gui.add(folder);
-        }
+        em.destroyEntity(entity);
     }
     update(dt){
+        Input.update(dt);
         this.stats.begin();
         this.world.update();
         this.stats.end();
     }
-    draw(){
-    }
     destroy(){
+        document.body.removeChild(this.stats.dom);
+        this.world.destroy();
+        this.onDestroy();
+    }
+    onDestroy(){
     }
     onResize(w,h){
-        this.renderer.setSize(w, h);
-        this.camera.aspect = w / h;
-        this.camera.updateProjectionMatrix();
+        ThreeRender.getInstance().onResize(w,h);
+    }
+    keypressed(key){
+        Input.keypressed(key);
+    }
+    keyreleased(key){
+        Input.keyreleased(key);
+    }
+    
+    gamepadpressed (btn) {
+        Input.gamepadpressed(btn);
+    }
+    
+    gamepadreleased (btn) {
+        Input.gamepadreleased(btn);
+    }
+    
+    gamepadAxis (x, y) {
+        Input.gamepadAxis(x, y);
+    }
+    
+    gamepadTurnAxis (x, y) {
+        Input.gamepadTurnAxis(x, y);
+    }
+    
+    mousepressed (x, y, btn) {
+        Input.mousepressed(x, y, btn);
+    }
+    
+    mousereleased (x, y, btn) {
+        Input.mousereleased(x, y, btn);
+    }
+    
+    wheelmoved (x, y) {
+        Input.wheelmoved(x, y);
+    }
+    
+    mousemoved (x, y, dx, dy) {
+        Input.mousemoved(x, y, dx, dy);
+    }
+    
+    touchpressed (id, x, y, dx, dy) {
+        Input.touchpressed(id, x, y, dx, dy);
+    }
+    
+    touchreleased (id, x, y, dx, dy) {
+        Input.touchreleased(id, x, y, dx, dy);
+    }
+    
+    touchmoved (id, x, y, dx, dy) {
+        Input.touchmoved(id, x, y, dx, dy);
     }
 }
 
 class ThreeGameEngine {
     constructor(){
-        this.gameScene = new GameScene();
+        
     }
     static createInstance(){
         ThreeGameEngine.instance = new ThreeGameEngine();
@@ -111,11 +128,13 @@ class ThreeGameEngine {
         }
         return ThreeGameEngine.createInstance();
     }
+    async loadScene(cls){
+        this.gameScene = new cls();
+        await this.gameScene.load();
+    }
     async init(){
         ThreePhysics.createInstance();
         await ThreePhysics.getInstance().init();
-
-        this.gameScene.load();
 
         SetElapsedTime(0);
         let _this = this;
@@ -125,14 +144,65 @@ class ThreeGameEngine {
             SetElapsedTime(now);
             SetDeletaTime(dt);
             if(_this.gameScene && _this.gameScene.update) _this.gameScene.update(dt);
-            if(_this.gameScene && _this.gameScene.draw) _this.gameScene.draw();
             requestAnimationFrame(tick);
         };
         tick();
     }
     onResize(w,h){
-        this.gameScene.onResize(w,h);
+        if(this.gameScene) this.gameScene.onResize(w,h);
+    }
+
+    keypressed(key){
+        if(this.gameScene) this.gameScene.keypressed(key);
+    }
+
+    keyreleased(key){
+        if(this.gameScene) this.gameScene.keyreleased(key);
+    }
+    
+    gamepadpressed (btn) {
+        if(this.gameScene) this.gameScene.gamepadpressed(btn);
+    }
+    
+    gamepadreleased (btn) {
+        if(this.gameScene) this.gameScene.gamepadreleased(btn);
+    }
+    
+    gamepadAxis (x, y) {
+        if(this.gameScene) this.gameScene.gamepadAxis(x,y);
+    }
+    
+    gamepadTurnAxis (x, y) {
+        if(this.gameScene) this.gameScene.gamepadTurnAxis(x,y);
+    }
+    
+    mousepressed (x, y, btn) {
+        if(this.gameScene) this.gameScene.mousepressed(x,y, btn);
+    }
+    
+    mousereleased (x, y, btn) {
+        if(this.gameScene) this.gameScene.mousereleased(x,y, btn);
+    }
+    
+    wheelmoved (x, y) {
+        if(this.gameScene) this.gameScene.wheelmoved(x,y);
+    }
+    
+    mousemoved (x, y, dx, dy) {
+        if(this.gameScene) this.gameScene.mousemoved(x,y, dx, dy);
+    }
+    
+    touchpressed (id, x, y, dx, dy) {
+        if(this.gameScene) this.gameScene.touchpressed(id, x, y, dx, dy);
+    }
+    
+    touchreleased (id, x, y, dx, dy) {
+        if(this.gameScene) this.gameScene.touchreleased(id, x, y, dx, dy);
+    }
+    
+    touchmoved (id, x, y, dx, dy) {
+        if(this.gameScene) this.gameScene.touchmoved(id, x, y, dx, dy);
     }
 }
 
-export {ThreeGameEngine};
+export {ThreeGameEngine,GameScene};

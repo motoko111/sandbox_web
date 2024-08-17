@@ -59,7 +59,8 @@ class SoundPlayer{
     }
     createSynth(onload){
         onload();
-        return new Tone.Synth().toDestination();
+        // return new Tone.Synth({oscillator:{type:"pulse"}}).toDestination();
+        return new Tone.FMSynth().toDestination();
     }
     initSynths(){
         for(let i = this.synths.length-1;i<20;++i){
