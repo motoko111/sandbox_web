@@ -46,23 +46,23 @@ document.addEventListener("wheel", (e) => {
     engine.wheelmoved(e.deltaX,e.deltaY);
 });
 document.addEventListener("touchstart", (e) => {
-    e.preventDefault();
+    //e.preventDefault();
     for (let i = 0; i < e.touches.length; i++) {
         const touch = e.touches[i];
         lastTouchPositions[touch.identifier] = { x: touch.clientX, y: touch.clientY };
         if(touch.identifier == 0) engine.mousepressed(touch.clientX,touch.clientY,0);
     }
-});
+}, true);
 document.addEventListener("touchend", (e) => {
-    e.preventDefault();
+    //e.preventDefault();
     for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
         lastTouchPositions[touch.identifier] = undefined;
         if(touch.identifier == 0) engine.mousereleased(touch.clientX,touch.clientY,0);
     }
-});
+}, true);
 document.addEventListener("touchmove", (e) => {
-    e.preventDefault();
+    //e.preventDefault();
     for (let i = 0; i < e.touches.length; i++) {
         const touch = e.touches[i];
         let lastPosition = lastTouchPositions[touch.identifier];
@@ -76,4 +76,4 @@ document.addEventListener("touchmove", (e) => {
             if(touch.identifier == 0) engine.mousemoved(touch.clientX, touch.clientY, deltaX, deltaY);
         }
     }
-});
+}, true);
