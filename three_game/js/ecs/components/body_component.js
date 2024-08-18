@@ -4,6 +4,12 @@
 import {Component} from '../component.js';
 import { ThreePhysics } from "../../three_physics.js";
 import RAPIER from 'https://cdn.skypack.dev/@dimforge/rapier3d-compat';
+import * as THREE from 'three';
+
+let tempVec3 = {x:0,y:0,z:0};
+let tempVec4 = {x:0,y:0,z:0,w:0};
+let tempQuat = new THREE.Quaternion();
+let tempEuler = new THREE.Euler();
 
 export class BodyComponent extends Component {
     constructor(bodyType = "dynamic", shape = "ball", ...args) {
@@ -39,33 +45,45 @@ export class BodyComponent extends Component {
         this.shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
         this.collider = world.createCollider(this.shape, this.rigidbody);
 
-        this.tempVec3 = {x:0,y:0,z:0};
     }
     // 位置
     setPosition(x,y,z){
-        this.tempVec3.x = x;
-        this.tempVec3.y = y;
-        this.tempVec3.z = z;
-        this.rigidbody.setTranslation(this.tempVec3);
+        tempVec3.x = x;
+        tempVec3.y = y;
+        tempVec3.z = z;
+        this.rigidbody.setTranslation(tempVec3);
+    }
+    // 回転 quaternion
+    setRotation(x,y,z,w = 1){
+        tempVec4.x = x;
+        tempVec4.y = y;
+        tempVec4.z = z;
+        tempVec4.w = w;
+        this.rigidbody.setRotation(tempVec4);
+    }
+    // 回転 euler
+    setEulerAngle(x,y,z){
+        tempQuat.setFromEuler(tempEuler.set(THREE.MathUtils.degToRad(x),THREE.MathUtils.degToRad(y),THREE.MathUtils.degToRad(z)));
+        this.setRotation(tempQuat.x,tempQuat.y,tempQuat.z,tempQuat.w);
     }
     // 速度
     setVelocity(x,y,z){
-        this.tempVec3.x = x;
-        this.tempVec3.y = y;
-        this.tempVec3.z = z;
-        this.rigidbody.setLinvel(this.tempVec3, true);
+        tempVec3.x = x;
+        tempVec3.y = y;
+        tempVec3.z = z;
+        this.rigidbody.setLinvel(tempVec3, true);
     }
     // 加速度
     setAccelerator(x,y,z){
-        this.tempVec3.x = x;
-        this.tempVec3.y = y;
-        this.tempVec3.z = z;
+        tempVec3.x = x;
+        tempVec3.y = y;
+        tempVec3.z = z;
     }
     // 角速度
     setAngleVelocity(x,y,z){
-        this.tempVec3.x = x;
-        this.tempVec3.y = y;
-        this.tempVec3.z = z;
-        this.rigidbody.setAngvel(this.tempVec3, true);
+        tempVec3.x = x;
+        tempVec3.y = y;
+        tempVec3.z = z;
+        this.rigidbody.setAngvel(tempVec3, true);
     }
 }

@@ -21,7 +21,7 @@ export class SpawnSystem extends System {
         let _this = this;
         let dt = GetDeltaTime();
 
-        let isSpawn = Input.isOnInputKey(EInputKey.ENTER);
+        let isSpawn = Input.isOnTriggerInputKey(EInputKey.ENTER);
         if(isSpawn){
             this.spawn();
         }

@@ -34,11 +34,10 @@ class ThreeRender {
         });
         this.renderer.setSize(width, height);
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
         // シーン
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color( 0x151729 );
+        this.scene.background = new THREE.Color( 0x2c5e44 );
 
         // カメラ
         this.camera = new THREE.PerspectiveCamera(75, width / height, 1, 10000);
@@ -46,7 +45,7 @@ class ThreeRender {
         this.scene.add(this.camera);
 
         // ライト
-        this.ambientLight = new THREE.AmbientLight( 0xc7cae0 , 1.5 );
+        this.ambientLight = new THREE.AmbientLight( 0xf1f2fe , 2 );
         this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
         this.directionalLight.position.set(80, 100, 0);
         this.directionalLight.castShadow = true;
@@ -80,11 +79,11 @@ class ThreeRender {
         }
     }
     update(){
-        if(!this.postProcess){
-            this.renderer.render(this.scene, this.camera);
+        if(this.postProcess && this.postProcess.isActive()){
+            this.postProcess.update();
         }
         else{
-            this.postProcess.update();
+            this.renderer.render(this.scene, this.camera);
         }
         //
     }
@@ -104,8 +103,16 @@ class ThreeRender {
         return cameraRight;
     }
     addDebugGUI(gui){
-        let sceneFolder = gui.addFolder("scene");{
+        let sceneFolder = gui.addFolder("scene");
+        {
             sceneFolder.addColor(this.scene, "background");
+        }
+        let renderFolder = gui.addFolder("renderer");
+        {
+            let _this = this;
+            renderFolder.add(this.renderer.shadowMap, "enabled").onChange((v)=>{
+                _this.renderer.render(_this.scene,_this.camera);
+            });
         }
         let lightFolder = gui.addFolder("light");
         {

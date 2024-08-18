@@ -62,10 +62,10 @@ export class CoinPusherScene extends GameScene{
         };
         let size = 20;
         let height = 10;
-        floor(0,0,0, size*2,1,size);
-        floor(0,height/2,-size/2, size*2,height,1);
-        let push = floor(0,height/2,-size/2, size*2,height/2,4);
-        em.addComponent(push, SinMoveComponent, {x:0,y:height/2,z:-size/2}, {x:0,y:0,z:4}, 1.0);
+        floor(0,0,0, size*2,1,size*2);
+        floor(0,height,-size, size*2,height*2,1);
+        let push = floor(0,height/4,-size/2, size*2,height/2,16);
+        em.addComponent(push, SinMoveComponent, {x:0,y:height/4,z:-size/2-6}, {x:0,y:0,z:4}, 1.0);
 
         let right = floor(size*0.75,height/2,0, 1,height,size);
         let left = floor(-size*0.75,height/2,0, 1,height,size);
@@ -121,7 +121,8 @@ export class CoinPusherScene extends GameScene{
             let ppos = pbody.rigidbody.translation();
             body.rigidbody.setBodyType(RAPIER.RigidBodyType.Dynamic);
             body.setPosition(Math.sin(GetElapsedTime()) * 10,10,10);
-            body.setVelocity(0,0,-10);
+            body.setEulerAngle(0,0,0);
+            body.setVelocity(0,4,-20);
         });
         this.world.createSystem(DeleteCoinSystem, em, (entity) => {
             pool.unused(entity);
