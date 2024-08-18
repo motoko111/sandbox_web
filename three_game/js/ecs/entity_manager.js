@@ -37,7 +37,7 @@ export class EntityManager{
     }
     addComponent(entity, cls, ...args){
         if(this.hasComonent(entity,cls)){
-            error("already add component.");
+            console.error("already add component.");
             return;
         }
         let arr = this.getComponents(cls);

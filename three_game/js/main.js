@@ -15,7 +15,7 @@ window.addEventListener("resize",()=>{
     engine.onResize(window.innerWidth, window.innerHeight);
 });
 document.addEventListener("keydown", (e) => {
-    engine.keypressed(elapsedFrame.code);
+    engine.keypressed(e.code);
 });
 document.addEventListener("keyup", (e) => {
     engine.keyreleased(e.code);
@@ -42,7 +42,7 @@ document.addEventListener("mousemove", (e) => {
     lastMouseY = e.clientY;
 });
 document.addEventListener("wheel", (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     engine.wheelmoved(e.deltaX,e.deltaY);
 });
 document.addEventListener("pointerdown", (e) => {

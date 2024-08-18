@@ -30,14 +30,29 @@ export class CoinPusherScene extends GameScene{
         let em = this.world.entityManager;
         this.score = 0;
 
-        const light = new THREE.DirectionalLight(0xffffff, 2);
-        light.position.set(80, 100, 0).normalize();
-        _this.addEntity(light);
+        const texLoader = new THREE.TextureLoader();
+        let pixelTex = (tex) => {
+            tex.minFilter = THREE.NearestFilter
+            tex.magFilter = THREE.NearestFilter
+            tex.generateMipmaps = false
+            tex.wrapS = THREE.RepeatWrapping
+            tex.wrapT = THREE.RepeatWrapping
+            return tex
+        };
+        const tex_floor = pixelTex( texLoader.load( "./assets/checker.png" ) );
+        const tex_box = pixelTex( texLoader.load( "./assets/cockey.png" ) );
+        tex_floor.repeat.set( 1.5, 1.5 );
+        let floorMaterial = new THREE.MeshPhongMaterial( { map: tex_floor } );
+        let boxMaterial = new THREE.MeshPhongMaterial( { map: tex_box } );
+        //let floorMaterial = new THREE.MeshStandardMaterial(  );
+        //let boxMaterial = new THREE.MeshStandardMaterial(  );
 
         let floor = (x,y,z ,w,h,d, opt) => {
             const mesh = new THREE.Mesh(
             new THREE.BoxGeometry(w,h,d),
-            new THREE.MeshNormalMaterial());
+            floorMaterial);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
 
             let entity = _this.addEntity(mesh);
             let body = em.addComponent(entity, BodyComponent, "fixed", "box", w/2,h/2,d/2);
@@ -49,18 +64,20 @@ export class CoinPusherScene extends GameScene{
         let height = 10;
         floor(0,0,0, size*2,1,size);
         floor(0,height/2,-size/2, size*2,height,1);
-        let push = floor(0,height/2,-size/2, size*2,height/2,1);
+        let push = floor(0,height/2,-size/2, size*2,height/2,4);
         em.addComponent(push, SinMoveComponent, {x:0,y:height/2,z:-size/2}, {x:0,y:0,z:4}, 1.0);
 
-        let right = floor(size/2,height/2,0, 1,height,size);
-        let left = floor(-size/2,height/2,0, 1,height,size);
-        em.addComponent(right, SinMoveComponent, {x:size/2,y:height/2,z:0}, {x:2,y:0,z:0}, 1.4);
-        em.addComponent(left, SinMoveComponent, {x:-size/2,y:height/2,z:0}, {x:-2,y:0,z:0}, 1.2);
+        let right = floor(size*0.75,height/2,0, 1,height,size);
+        let left = floor(-size*0.75,height/2,0, 1,height,size);
+        em.addComponent(right, SinMoveComponent, {x:size*0.75,y:height/2,z:0}, {x:2,y:0,z:0}, 1.4);
+        em.addComponent(left, SinMoveComponent, {x:-size*0.75,y:height/2,z:0}, {x:-2,y:0,z:0}, 1.2);
 
         let coin = (x,y,z ,w,h,d) => {
             const mesh = new THREE.Mesh(
             new THREE.BoxGeometry(w, h, d),
-            new THREE.MeshNormalMaterial());
+            boxMaterial);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
 
             let entity = _this.addEntity(mesh);
             let body = em.addComponent(entity, BodyComponent, "dynamic", "box", w/2,h/2,d/2);
@@ -71,7 +88,7 @@ export class CoinPusherScene extends GameScene{
         // for(let i = 0; i < 500; i++) coin(Math.random() * 20 - 10,Math.random() * 10,Math.random() * 20 - 10, 2,0.2,2);
         
         let pool = new ObjectPool(500, () => {
-            let entity = coin(Math.random() * 20 - 10,Math.random() * 10,Math.random() * 20 - 10, 2,0.2,2);
+            let entity = coin(Math.random() * 20 - 10,Math.random() * 10,Math.random() * 10 - 5, 2,0.4,2);
             em.addComponent(entity, ActiveTag);
             return entity;
         }, (entity) => {
@@ -96,6 +113,9 @@ export class CoinPusherScene extends GameScene{
         this.world.createSystem(MoveSystem, em);
         this.world.createSystem(SpawnSystem, em, () => {
             let entity = pool.getItem();
+            if(!em.hasComonent(entity, ActiveTag)){
+                em.addComponent(entity, ActiveTag);
+            }
             let body = em.getComponent(entity, BodyComponent);
             let pbody = em.getComponent(player, BodyComponent);
             let ppos = pbody.rigidbody.translation();
@@ -133,6 +153,7 @@ export class CoinPusherScene extends GameScene{
             const folder = gui.addFolder( 'game' );
             folder.add(this, 'score').listen().disable();
         }
+        ThreeRender.getInstance().addDebugGUI(gui);
         this.updateDebug();
     }
     updateDebug(){

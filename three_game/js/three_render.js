@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { PostProcess } from "./shader/postprocess.js";
 
 let cameraForward = new THREE.Vector3();
 let cameraRight = new THREE.Vector3();
@@ -29,27 +30,49 @@ class ThreeRender {
         const canvasElement = document.querySelector('#threeCanvas')
         this.renderer = new THREE.WebGLRenderer({
             canvas: canvasElement,
+            antialias: false
         });
         this.renderer.setSize(width, height);
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
         // シーン
         this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color( 0x151729 );
 
         // カメラ
         this.camera = new THREE.PerspectiveCamera(75, width / height, 1, 10000);
         this.camera.position.set(0,10,20);
         this.scene.add(this.camera);
 
+        // ライト
+        this.ambientLight = new THREE.AmbientLight( 0xc7cae0 , 1.5 );
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        this.directionalLight.position.set(80, 100, 0);
+        this.directionalLight.castShadow = true;
+        this.directionalLight.shadow.mapSize.set( 512, 512 );
+        this.directionalLight.shadow.camera.near = 0.5;
+        this.directionalLight.shadow.camera.far = 500;
+        this.directionalLight.shadow.camera.top = 50;
+        this.directionalLight.shadow.camera.bottom = -50;
+        this.directionalLight.shadow.camera.right = 50;
+        this.directionalLight.shadow.camera.left = -50;
+        this.scene.add(this.ambientLight);
+        this.scene.add(this.directionalLight);
+
         // カメラ操作
         this.controls = new OrbitControls(this.camera, canvasElement);
 
         // グリッド
         this.gridHelper = new THREE.GridHelper(50,50);
-        this.scene.add(this.gridHelper);
+        //this.scene.add(this.gridHelper);
 
         // 方向
         this.axesHelper = new THREE.AxesHelper(180);
-        this.scene.add(this.axesHelper);
+        //this.scene.add(this.axesHelper);
+
+        // ポスプロ
+        this.postProcess = new PostProcess(this.renderer, this.scene, this.camera, width, height);
     }
     clear(){
         if(this.scene){
@@ -57,12 +80,19 @@ class ThreeRender {
         }
     }
     update(){
-        this.renderer.render(this.scene, this.camera);
+        if(!this.postProcess){
+            this.renderer.render(this.scene, this.camera);
+        }
+        else{
+            this.postProcess.update();
+        }
+        //
     }
     onResize(w,h){
         this.renderer.setSize(w, h);
         this.camera.aspect = w / h;
         this.camera.updateProjectionMatrix();
+        this.postProcess.onResize(w,h);
     }
 
     getCameraForward(){
@@ -72,6 +102,23 @@ class ThreeRender {
     getCameraRight(){
         this.camera.matrixWorld.extractBasis(cameraRight, temp1, temp2);
         return cameraRight;
+    }
+    addDebugGUI(gui){
+        let sceneFolder = gui.addFolder("scene");{
+            sceneFolder.addColor(this.scene, "background");
+        }
+        let lightFolder = gui.addFolder("light");
+        {
+            let folder = lightFolder.addFolder("ambientLight");
+            folder.addColor(this.ambientLight, "color");
+            folder.add(this.ambientLight,"intensity", 0, 10);
+        }
+        {
+            let folder = lightFolder.addFolder("directionalLight");
+            folder.addColor(this.directionalLight, "color");
+            folder.add(this.directionalLight,"intensity", 0, 10);
+        }
+        this.postProcess.addDebugGUI(gui);
     }
 }
 
