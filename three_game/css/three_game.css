@@ -4,6 +4,7 @@ body, html {
     overflow: hidden; /* スクロールバーも消す */
     height: 100%;
     user-select: none;
+    touch-action: manipulation;
 }
 canvas {
     display: block; /* canvasのデフォルトのインラインスペースを消す */

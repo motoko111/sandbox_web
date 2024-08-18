@@ -18,6 +18,7 @@ class GameScene{
         this.stats = new Stats();
         this.stats.showPanel(0);
         document.body.appendChild(this.stats.dom);
+        this.stats.dom.style.userSelect = 'none';
     }
     async load(){
     }
