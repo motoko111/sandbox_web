@@ -31,8 +31,43 @@ class ThreePhysics{
             const col2 = _this.world.getCollider(handle2)
             // console.log(`Collider ${col1} and Collider ${col2} have collided.`);
         });
-
+        if(this.debugRenderer){
+            this.debugRenderer.update();
+        }
     }
+    setupDebug(scene){
+        this.debugRenderer = new ThreePhsyicsDebugRenderer(scene, this.world);
+        this.debugRenderer.enabled = false;
+    }
+    addDebugGUI(gui){
+        let physicsFolder = gui.addFolder("physics");
+        if(this.debugRenderer)
+        {
+            let folder = physicsFolder.addFolder("debug renderer");
+            folder.add(this.debugRenderer, "enabled");
+        }
+    }
+}
+
+class ThreePhsyicsDebugRenderer{
+    constructor(scene, world) {
+        this.world = world
+        this.enabled = true;
+        this.mesh = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xffffff, vertexColors: true }))
+        this.mesh.frustumCulled = false
+        scene.add(this.mesh)
+      }
+    
+      update() {
+        if (this.enabled) {
+          const { vertices, colors } = this.world.debugRender()
+          this.mesh.geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+          this.mesh.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 4))
+          this.mesh.visible = true
+        } else {
+          this.mesh.visible = false
+        }
+      }
 }
 
 export { ThreePhysics }

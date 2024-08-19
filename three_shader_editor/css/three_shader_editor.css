@@ -1,0 +1,71 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* スクロールバーも消す */
+    height: 100%;
+}
+canvas {
+    display: block; /* canvasのデフォルトのインラインスペースを消す */
+    margin: 0;
+    padding: 0;
+
+    user-select: none; /* Non-prefixed version, supported by Chrome, Opera and Edge */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    -webkit-touch-callout: none; /* iOS Safari */
+    touch-action: manipulation;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+#canvasContainer {
+    width: 40%;
+    height: 100%;
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#threeCanvas {
+    width: 100%;
+    height: 100%;
+}
+
+#editorContainer {
+    display: block;
+    margin: 0;
+    padding: 0;
+    width: 60%;
+    height: 100%;
+    resize: horizontal;
+    overflow: auto;
+    border-right: 5px solid #ccc;
+}
+.editor {
+    width: 100%;
+    height: 44%;
+    margin-top: 2px;
+}
+.editor_error {
+    width: 100%;
+    height: 5%;
+    color: red;
+    background-color: black;
+    font-size: 12px;
+}
+
+.resizer {
+    width: 5px;
+    background-color: #ccc;
+    cursor: col-resize;
+}
+
+.hidden {
+    display: none;
+}

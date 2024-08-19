@@ -3,6 +3,7 @@ import {Entity} from "./enitty.js";
 export class EntityManager{
     constructor(){
         this.nextId = 0;
+        this.unUsedIds = [];
         this.entities = [];
         this.componentMap = new Map();
         this.componentCountMap = new Map();
@@ -15,7 +16,15 @@ export class EntityManager{
         this.nextId = 0;
     }
     createEntity(){
-        let entity = new Entity(this.nextId++);
+        let id = 0;
+        if(this.unUsedIds.length > 0) {
+            id = this.unUsedIds[this.unUsedIds.length-1];
+            this.unUsedIds.splice(this.unUsedIds.length-1,1);
+        }
+        else{
+            id = this.nextId++;
+        }
+        let entity = new Entity(id);
         this.entities = this.capacity(this.entities, entity.id);
         this.entities[entity.id] = entity;
         return entity;
@@ -26,6 +35,7 @@ export class EntityManager{
             for (let cls of this.componentMap.keys()) {
                 this.removeComponent(entity.id,cls);
             }
+            this.unUsedIds.push(entity.id);
         }
     }
     getEntity(id){

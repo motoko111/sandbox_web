@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>three_shader_editor</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.167.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.167.0/examples/jsm/"
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/three_shader_editor.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.13/ace.js"></script>
+  <script type="module" src="js/three_shader_editor.js"></script>
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div id="editorContainer">
+      <div id = "editor_vert" class="editor">
+      </div>
+      <div id = "editor_vert_true" class="editor hidden">
+      </div>
+      <div id = "editor_vert_error" class="editor_error">
+      </div>
+      <div id = "editor_frag" class="editor">
+      </div>
+      <div id = "editor_frag_true" class="editor hidden">
+      </div>
+      <div id = "editor_frag_error" class="editor_error">
+      </div>
+    </div>
+    <div id="canvasContainer">
+      <canvas id="threeCanvas"></canvas>
+    </div>
+  </div>
+</body>
+</html>

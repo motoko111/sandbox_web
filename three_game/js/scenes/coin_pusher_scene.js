@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import RAPIER from 'https://cdn.skypack.dev/@dimforge/rapier3d-compat';
 import GUI from 'https://cdn.jsdelivr.net/npm/lil-gui@0.19/+esm';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { BodyComponent } from "../ecs/components/body_component.js";
 import { AddObjectTag, ObjectComponent } from "../ecs/components/object_component.js";
 import { PhysicsSystem } from "../ecs/systems/physics_system.js";
@@ -17,6 +18,18 @@ import { SinMoveComponent } from "../ecs/components/sin_move_component.js";
 import { SpawnSystem } from "../ecs/systems/spawn_system.js";
 import { DeleteCoinSystem } from "../ecs/systems/delete_coin_system.js";
 import { ObjectPool } from "../utils/object_pool.js";
+import { ModelLoader } from "../utils/model_loader.js";
+import { ModelComponent } from "../ecs/components/model_component.js";
+import { InstancedMeshComponent, InstancedMeshObjectComponent } from "../ecs/components/instanced_mesh_component.js";
+import { PhysicsInstancedSystem } from "../ecs/systems/physics_instanced_system.js";
+import { ThreePhysics } from "../three_physics.js";
+
+let createInstancedMesh = function(geometry, material, count) {
+    // InstancedMeshを作成
+    const instancedMesh = new THREE.InstancedMesh(geometry, material, count);
+
+    return instancedMesh;
+}
 
 export class CoinPusherScene extends GameScene{
     constructor(){
@@ -87,7 +100,7 @@ export class CoinPusherScene extends GameScene{
         };
         // for(let i = 0; i < 500; i++) coin(Math.random() * 20 - 10,Math.random() * 10,Math.random() * 20 - 10, 2,0.2,2);
         
-        let pool = new ObjectPool(500, () => {
+        let pool = new ObjectPool(0, () => {
             let entity = coin(Math.random() * 20 - 10,Math.random() * 10,Math.random() * 10 - 5, 2,0.4,2);
             em.addComponent(entity, ActiveTag);
             return entity;
@@ -109,6 +122,39 @@ export class CoinPusherScene extends GameScene{
         }
         let player = createPlayer();
 
+        // model
+        {
+            let model = await ModelLoader.load("./assets/model/quad6.glb");
+            let mesh = model.getMesh();
+            //mesh.material = boxMaterial;
+            //mesh.material.castShadow = true;
+            //mesh.material.receiveShadow = true; 
+            let w = 20;
+            let h = 20;
+            let d = 4;
+            let count = w * h * d;
+            const instancedMesh = new THREE.InstancedMesh(mesh.geometry, mesh.material, count);
+            instancedMesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+            let entity = _this.addEntity(instancedMesh);
+            let instancedMeshComp = em.addComponent(entity, InstancedMeshComponent, instancedMesh);
+            let param = model.getVerticies();
+            let index = 0;
+            for(let y = 0; y < h; y++){
+                for(let z = 0; z < d; z++){
+                    for(let x = 0; x < w; x++){
+                        let childEntity = em.createEntity();
+                        em.addComponent(childEntity, InstancedMeshObjectComponent, entity, index);
+                        // let body = em.addComponent(childEntity, BodyComponent, "fixed", "trimesh", param.verticies, param.triangles);
+                        let body = em.addComponent(childEntity, BodyComponent, "fixed", "box", 0.5,0.5,0.5);
+                        body.setPosition(x,y,z);
+                        em.addComponent(childEntity, SinMoveComponent, {x:x,y:y,z:z}, {x:Math.random()*4,y:Math.random()*4,z:4}, Math.random()*10);
+                        index++;
+                    }
+                }
+            }
+        }
+
+        // systems
         this.world.createSystem(ControlSystem, em);
         this.world.createSystem(MoveSystem, em);
         this.world.createSystem(SpawnSystem, em, () => {
@@ -133,6 +179,7 @@ export class CoinPusherScene extends GameScene{
             _this.score += 10;
         });
         this.world.createSystem(PhysicsSystem, em);
+        this.world.createSystem(PhysicsInstancedSystem, em);
         this.world.createSystem(RenderSystem, em);
 
         this.setupDebug();
@@ -155,6 +202,8 @@ export class CoinPusherScene extends GameScene{
             folder.add(this, 'score').listen().disable();
         }
         ThreeRender.getInstance().addDebugGUI(gui);
+        ThreePhysics.getInstance().setupDebug(ThreeRender.getInstance().scene);
+        ThreePhysics.getInstance().addDebugGUI(gui);
         this.updateDebug();
     }
     updateDebug(){

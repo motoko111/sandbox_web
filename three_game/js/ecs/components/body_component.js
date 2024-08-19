@@ -36,7 +36,7 @@ export class BodyComponent extends Component {
                 this.shape = RAPIER.ColliderDesc.capsule(args[0], args[1]);
             }break;
             case "trimesh":{
-                this.shape = RAPIER.ColliderDesc.trimesh(params.verticies, params.indices);
+                this.shape = RAPIER.ColliderDesc.trimesh(args[0], args[1]);
             }break;
             case "heightfield":{
                 this.shape = RAPIER.ColliderDesc.heightfield(args[0],args[1],args[2],args[3]);
