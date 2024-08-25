@@ -98,9 +98,8 @@ export class CoinPusherScene extends GameScene{
             body.setPosition(x,y,z);
             return entity;
         };
-        // for(let i = 0; i < 500; i++) coin(Math.random() * 20 - 10,Math.random() * 10,Math.random() * 20 - 10, 2,0.2,2);
         
-        let pool = new ObjectPool(0, () => {
+        let pool = new ObjectPool(500, () => {
             let entity = coin(Math.random() * 20 - 10,Math.random() * 10,Math.random() * 10 - 5, 2,0.4,2);
             em.addComponent(entity, ActiveTag);
             return entity;

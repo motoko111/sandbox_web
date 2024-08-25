@@ -15,3 +15,11 @@ canvas {
     margin: 0;
     padding: 0;
 }
+
+.disable_select {
+    user-select: none; /* Non-prefixed version, supported by Chrome, Opera and Edge */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    -webkit-touch-callout: none; /* iOS Safari */
+}

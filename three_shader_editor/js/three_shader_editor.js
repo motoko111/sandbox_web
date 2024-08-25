@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import GUI from 'https://cdn.jsdelivr.net/npm/lil-gui@0.19/+esm';
 const clock = new THREE.Clock();
 
 
@@ -22,6 +23,37 @@ void main()
 }
 `;
 
+
+let getType = (v) => {
+    let type = typeof v;
+    if(type == "object"){
+        if(v instanceof THREE.Vector2){
+            type = "vec2";
+        }
+        else if(v instanceof THREE.Vector3){
+            type = "vec3";
+        }
+        else if(v instanceof THREE.Vector4){
+            type = "vec4";
+        }
+        else if(v instanceof THREE.Matrix2){
+            type = "mat2";
+        }
+        else if(v instanceof THREE.Matrix3){
+            type = "mat3";
+        }
+        else if(v instanceof THREE.Matrix4){
+            type = "mat4";
+        }
+        else if(v instanceof THREE.Color){
+            type = "color";
+        }
+        else{
+            type = Object.prototype.toString.call(v);
+        }
+    }
+    return type;
+};
 
 class ShaderEditor{
     constructor(id){
@@ -112,7 +144,7 @@ class ShaderEditor{
             });
             // 変数を動的に抽出する関数
             function extractVariables(code) {
-                const variableRegex = /\b((?:uniform|varying|attribute|const|vec[234]|float|int|bool)\s+)+(\w+)/g;
+                const variableRegex = /\b((?:const|vec[234]|mat[234]|float|int|bool)\s+)+(\w+)/g;
                 let match;
                 const variables = new Set();
                 while (match = variableRegex.exec(code)) {
@@ -176,43 +208,15 @@ export class ThreeShaderEditor{
         this.vertexShaderEditor.onSave = () => {
             _this.vertexShaderEditor.saveLocalStorage();
             _this.fragmentShaderEditor.saveLocalStorage();
+            _this.saveUniforms();
         };
         this.fragmentShaderEditor.onSave = () => {
             _this.vertexShaderEditor.saveLocalStorage();
             _this.fragmentShaderEditor.saveLocalStorage();
+            _this.saveUniforms();
         };
         let keywords = [];
         let keywordsMap = {};
-        let getType = (v) => {
-            let type = typeof v;
-            if(type == "object"){
-                if(v instanceof THREE.Vector2){
-                    type = "vec2";
-                }
-                else if(v instanceof THREE.Vector3){
-                    type = "vec3";
-                }
-                else if(v instanceof THREE.Vector4){
-                    type = "vec4";
-                }
-                else if(v instanceof THREE.Matrix2){
-                    type = "mat2";
-                }
-                else if(v instanceof THREE.Matrix3){
-                    type = "mat3";
-                }
-                else if(v instanceof THREE.Matrix4){
-                    type = "mat4";
-                }
-                else if(v instanceof THREE.Color){
-                    type = "color";
-                }
-                else{
-                    type = Object.prototype.toString.call(v);
-                }
-            }
-            return type;
-        };
         for(let key in this.uniforms){
             keywords.push(key);
             let v = this.uniforms[key].value;
@@ -267,7 +271,7 @@ export class ThreeShaderEditor{
         this.scene.background = new THREE.Color( 0x2c5e44 );
 
         // カメラ
-        this.camera = new THREE.PerspectiveCamera(75, width / height, 1, 10000);
+        this.camera = new THREE.PerspectiveCamera(75, width / height, 0.001, 10000);
         this.camera.position.set(0,2,3);
         this.scene.add(this.camera);
 
@@ -307,40 +311,49 @@ export class ThreeShaderEditor{
             tex.wrapT = THREE.RepeatWrapping
             return tex
         };
-        this.texture = pixelTex( texLoader.load( "./assets/checker.png" ) );
+        //this.texture = pixelTex( texLoader.load( "./assets/checker.png" ) );
+        this.texture = texLoader.load( "./assets/uv_checker.jpg" );
 
         // var cubeShader = THREE.ShaderLib['cube'];
         // THREE.ShaderLib
 
-        // uniform
-        this.uniforms = THREE.UniformsUtils.merge([
-            THREE.UniformsLib.common,
-            THREE.UniformsLib.specularmap,
-            THREE.UniformsLib.envmap,
-            THREE.UniformsLib.aomap,
-            THREE.UniformsLib.lightmap,
-            THREE.UniformsLib.emissivemap,
-            THREE.UniformsLib.bumpmap,
-            THREE.UniformsLib.normalmap,
-            THREE.UniformsLib.displacementmap,
-            THREE.UniformsLib.gradientmap,
-            THREE.UniformsLib.fog,
-            THREE.UniformsLib.lights,
-            THREE.UniformsLib.points,
-            THREE.UniformsLib.sprite,
-            // custom
-            {
-                u_resolution: { 
-                    value:new THREE.Vector2(this.canvas.clientWidth, this.canvas.clientHeight)
-                },
-                u_time: {
-                    value:0.0
-                },
-                u_texture : {
-                    value:this.texture
-                }
+        this.customUniforms = {
+            u_resolution: { 
+                value:new THREE.Vector2(this.canvas.clientWidth, this.canvas.clientHeight)
+            },
+            u_time: {
+                value:0.0
+            },
+            u_texture : {
+                value:this.texture
+            },
+            u_uv_scroll : {
+                value:new THREE.Vector2(0,0)
             }
-        ]);
+        };
+        this.loadUniforms();
+        {
+            // uniform
+            this.uniforms = THREE.UniformsUtils.merge([
+                THREE.UniformsLib.common,
+                THREE.UniformsLib.specularmap,
+                THREE.UniformsLib.envmap,
+                THREE.UniformsLib.aomap,
+                THREE.UniformsLib.lightmap,
+                THREE.UniformsLib.emissivemap,
+                THREE.UniformsLib.bumpmap,
+                THREE.UniformsLib.normalmap,
+                THREE.UniformsLib.displacementmap,
+                THREE.UniformsLib.gradientmap,
+                THREE.UniformsLib.fog,
+                THREE.UniformsLib.lights,
+                THREE.UniformsLib.points,
+                THREE.UniformsLib.sprite,
+                // custom
+                this.customUniforms,
+            ]);
+        }
+        
         this.material = new THREE.ShaderMaterial({
             uniforms: this.uniforms,
             vertexShader: vertShaderText,
@@ -381,6 +394,8 @@ export class ThreeShaderEditor{
         
         this.prevVertexShaderText = this.material.vertexShader;
         this.prevFragmentShaderText = this.material.fragmentShader;
+
+        this.addDebugGUI();
     }
     updateShader(vertex = true, frag = true){
         let _this = this;
@@ -421,6 +436,68 @@ export class ThreeShaderEditor{
             }
         }
     }
+    saveUniforms(){
+        let data = {};
+        for(let key in this.uniforms){
+            let v = this.uniforms[key].value;
+            let type = this.uniforms[key].type;
+            if(this.customUniforms[key]){
+                if(!type){
+                    type = getType(v);
+                }
+                if(type == "number"){
+                    data[key] = {};
+                    data[key].value = v;
+                    data[key].type = type;
+                }
+                if(type == "vec2"){
+                    data[key] = {};
+                    data[key].value = {x:v.x,y:v.y};
+                    data[key].type = type;
+                }
+                if(type == "vec3"){
+                    data[key] = {};
+                    data[key].value = {x:v.x,y:v.y,z:v.z};
+                    data[key].type = type;
+                }
+                if(type == "vec4"){
+                    data[key] = {};
+                    data[key].value = {x:v.x,y:v.y,z:v.z,w:v.w};
+                    data[key].type = type;
+                }
+            }
+        }
+        localStorage.setItem("customUniforms", JSON.stringify(data));
+    }
+    loadUniforms(){
+        let data = JSON.parse(localStorage.getItem("customUniforms"));
+        if(data){
+            for(let key in data){
+                let v = data[key].value;
+                let type = data[key].type;
+                if(type == "number"){
+                    this.customUniforms[key] = {
+                        value:v
+                    }
+                }
+                if(type == "vec2"){
+                    this.customUniforms[key] = {
+                        value:new THREE.Vector2(v.x,v.y)
+                    }
+                }
+                if(type == "vec3"){
+                    this.customUniforms[key] = {
+                        value:new THREE.Vector3(v.x,v.y,v.z)
+                    }
+                }
+                if(type == "vec4"){
+                    this.customUniforms[key] = {
+                        value:new THREE.Vector4(v.x,v.y,v.z,v.w)
+                    }
+                }
+            }
+        }
+    }
     checkCompile(shaderName, txt){
         try{
             this.material[shaderName] = txt;
@@ -432,6 +509,45 @@ export class ThreeShaderEditor{
             return false;
         }
         return true;
+    }
+    addDebugGUI(gui){
+        if(!gui){
+            gui = new GUI();
+        }
+        let uniformsFolder = gui.addFolder("customUniforms").close();
+        {
+            const uniforms = this.uniforms;
+            for(let key in uniforms){
+                let v = uniforms[key].value;
+                let type = uniforms[key].type;
+                if(!type){
+                    type = getType(v);
+                }
+                if(type == "number"){
+                    let folder = uniformsFolder.addFolder(key).close();
+                    folder.add(uniforms[key], "value");
+                }
+                if(type == "vec2"){
+                    let folder = uniformsFolder.addFolder(key).close();
+                    folder.add(uniforms[key].value, "x");
+                    folder.add(uniforms[key].value, "y");
+                }
+                if(type == "vec3"){
+                    let folder = uniformsFolder.addFolder(key).close();
+                    folder.add(uniforms[key].value, "x");
+                    folder.add(uniforms[key].value, "y");
+                    folder.add(uniforms[key].value, "z");
+                }
+                if(type == "vec4"){
+                    let folder = uniformsFolder.addFolder(key).close();
+                    folder.add(uniforms[key].value, "x");
+                    folder.add(uniforms[key].value, "y");
+                    folder.add(uniforms[key].value, "z");
+                    folder.add(uniforms[key].value, "w");
+                }
+            }
+            
+        }
     }
     onResize(w,h){
         this.canvas.width = w * 0.5;

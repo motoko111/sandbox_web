@@ -40,9 +40,13 @@ class ThreeRender {
         this.scene.background = new THREE.Color( 0x2c5e44 );
 
         // カメラ
-        this.camera = new THREE.PerspectiveCamera(75, width / height, 1, 10000);
+        this.camera = new THREE.PerspectiveCamera(75, width / height, 0.001, 10000);
         this.camera.position.set(0,10,20);
         this.scene.add(this.camera);
+
+        //this.camera = new THREE.OrthographicCamera(-480, +480, 270, -270, 1, 1000);
+        //this.camera.position.set(0,10,20);
+        //this.scene.add(this.camera);
 
         // ライト
         this.ambientLight = new THREE.AmbientLight( 0xf1f2fe , 2 );

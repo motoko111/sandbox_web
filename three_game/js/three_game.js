@@ -19,6 +19,7 @@ class GameScene{
         this.stats.showPanel(0);
         document.body.appendChild(this.stats.dom);
         this.stats.dom.style.userSelect = 'none';
+        this.stats.dom.classList.add('disable_select');
     }
     async load(){
     }

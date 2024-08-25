@@ -1,5 +1,6 @@
 import { CoinPusherScene } from "./scenes/coin_pusher_scene.js";
 import { MainScene } from "./scenes/main_scene.js";
+import { MapScene } from "./scenes/map_scene.js";
 import {ThreeGameEngine} from "./three_game.js";
 
 let engine = ThreeGameEngine.getInstance();
@@ -9,7 +10,7 @@ let lastTouchPositions = {};
 
 window.addEventListener("load",async () => {
     await engine.init();
-    await engine.loadScene(CoinPusherScene);
+    await engine.loadScene(MapScene);
 });
 window.addEventListener("resize",()=>{
     engine.onResize(window.innerWidth, window.innerHeight);
