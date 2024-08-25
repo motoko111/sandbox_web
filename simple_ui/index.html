@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>three_ui</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.167.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.167.0/examples/jsm/"
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/simple_ui.css">
+  <script type="module" src="js/simple_ui.js"></script>
+  <script type="module" src="js/three_demo.js"></script>
+  <script type="module" src="js/main.js"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* スクロールバーも消す */
+      height: 100%;
+      user-select: none; /* Non-prefixed version, supported by Chrome, Opera and Edge */
+      -webkit-user-select: none; /* Safari */
+      -moz-user-select: none; /* Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+      -webkit-touch-callout: none; /* iOS Safari */
+  }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="canvasContainer">
+      <div id="simple-ui-root" class="simple-ui-root">
+        <canvas id="threeCanvas"></canvas>
+        <div id="simple-ui" class="simple-ui">
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

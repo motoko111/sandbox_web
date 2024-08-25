@@ -1,0 +1,43 @@
+.simple-ui-root {
+    position: relative;
+
+    --text-color: rgba(255, 255, 255, 0.8);
+    --background-color: rgba(44, 41, 41, 0.8);
+
+    --hover-color: rgba(130, 108, 255, 0.8);
+    --hover-text-color: rgba(255, 255, 255, 0.8);
+}
+
+.simple-ui {
+    position: absolute;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    bottom: 20px;
+    left: 20px;
+    z-index: 10;
+}
+
+.simple-ui .container {
+    background-color: var(--background-color);
+    overflow-y: auto; /* 縦方向にスクロールを可能にする */
+    width: 100%;
+    max-width: 400px;
+    height: 200px;
+}
+
+.simple-ui .item {
+    display: flex;
+}
+
+.simple-ui button {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-size: 2em;
+    border: 0;
+    padding: 0.4em;
+    margin: 0em;
+}
+.simple-ui button:hover {
+    background-color: var(--hover-color);
+    color: var(--hover-text-color);
+}
